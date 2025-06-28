@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlyCipher - Login y Registro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-auth-container">
+        <img src="img/Logo.jpeg" alt="Logo SlyCipher" class="logo-main">
+        <h2 class="main-title">SlyCipher</h2>
+        <div class="tabs">
+            <button class="tab-btn active" id="loginTabBtn" onclick="showTab('login')">Iniciar Sesión</button>
+            <button class="tab-btn" id="registerTabBtn" onclick="showTab('register')">Registrarse</button>
+        </div>
+        <div class="tab-content">
+            <!-- LOGIN FORMULARIO -->
+            <form id="loginForm" class="auth-form" autocomplete="off">
+                <h3>Iniciar Sesión</h3>
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="Correo electrónico" required data-validation="email">
+                    <small class="error-message"></small>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Contraseña" required data-validation="password">
+                    <small class="error-message"></small>
+                </div>
+                <button type="submit" class="button">Iniciar sesión</button>
+                <p class="auth-switch">¿No tienes cuenta? <span class="register-link" onclick="showTab('register')">Regístrate</span></p>
+                <div class="social-divider"><span>o inicia sesión con</span></div>
+                <div class="social-login">
+                    <button type="button" class="social-btn" title="Google">
+                        <img src="img/logo_google.png" alt="Google" class="icon-social">
+                        Google
+                    </button>
+                    <button type="button" class="social-btn" title="GitHub">
+                        <img src="img/github_536452.png" alt="GitHub" class="icon-social">
+                        GitHub
+                    </button>
+                </div>
+            </form>
+            <!-- REGISTRO FORMULARIO -->
+            <form id="registerForm" class="auth-form hidden" autocomplete="off">
+                <h3>Registro de Usuario</h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="text" name="nombre" placeholder="Nombre" required data-validation="nombre">
+                        <small class="error-message"></small>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" name="apellido" placeholder="Apellido" required data-validation="apellido">
+                        <small class="error-message"></small>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="date" name="fecha" required data-validation="fecha">
+                        <small class="error-message"></small>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" name="email" placeholder="Correo electrónico" required data-validation="email">
+                        <small class="error-message"></small>
+                        <div class="help-message" id="emailHelp">
+                            El correo debe tener formato usuario@dominio.com
+                        </div>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="password" name="password" placeholder="Contraseña" required data-validation="password" autocomplete="new-password">
+                        <small class="error-message"></small>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <div class="requirement" data-req="length">● Entre 8 y 20 caracteres</div>
+                            <div class="requirement" data-req="uppercase">● Al menos una letra mayúscula (A-Z)</div>
+                            <div class="requirement" data-req="lowercase">● Al menos una letra minúscula (a-z)</div>
+                            <div class="requirement" data-req="number">● Al menos un número (0-9)</div>
+                            <div class="requirement" data-req="special">● Al menos un carácter especial (!@#$%^&*)</div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="button">Registrarse</button>
+                <p class="auth-switch">¿Ya tienes cuenta? <span class="login-link" onclick="showTab('login')">Inicia sesión</span></p>
+                <div class="social-divider"><span>o regístrate con</span></div>
+                <div class="social-login">
+                    <button type="button" class="social-btn" title="Google">
+                        <img src="img/logo_google.png" alt="Google" class="icon-social">
+                        Google
+                    </button>
+                    <button type="button" class="social-btn" title="GitHub">
+                        <img src="img/github_536452.png" alt="GitHub" class="icon-social">
+                        GitHub
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

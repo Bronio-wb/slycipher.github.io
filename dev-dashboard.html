@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlyCipher - Dashboard Desarrollador</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="img/Logo.jpeg" alt="Logo SlyCipher" class="logo">
+            </div>
+            <h3>Desarrollador</h3>
+            <nav>
+                <a href="#" onclick="showSection('lecciones')">Lecciones</a>
+                <a href="#" onclick="showSection('cursos')">Cursos</a>
+                <a href="index.html">Cerrar sesión</a>
+            </nav>
+        </aside>
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Gestión de Lecciones -->
+            <section id="section-lecciones" class="section">
+                <h2>Gestión de Lecciones</h2>
+                <form id="createLessonForm" class="course-form">
+                    <select name="curso" required>
+                        <!-- Opciones de cursos se llenan por JS -->
+                    </select>
+                    <input type="text" name="titulo" placeholder="Título de la lección" required>
+                    <textarea name="contenido" placeholder="Contenido de la lección" rows="2" style="min-width:170px;max-width:350px;"></textarea>
+                    <button type="submit" class="btn btn-success">Crear Lección</button>
+                </form>
+                <ul id="leccionesList"></ul>
+            </section>
+            <!-- Proponer contenido para cursos -->
+            <section id="section-cursos" class="section hidden">
+                <h2>Contenido de Cursos</h2>
+                <div id="cursosPropuestos"></div>
+            </section>
+        </main>
+    </div>
+    <script src="dev-dashboard.js"></script>
+</body>
+</html>

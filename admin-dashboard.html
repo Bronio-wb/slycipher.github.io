@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlyCipher - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="img/Logo.jpeg" alt="Logo SlyCipher" class="logo">
+            </div>
+            <h3>Administrador</h3>
+            <nav>
+                <a href="#" onclick="showSection('usuarios')">Usuarios</a>
+                <a href="#" onclick="showSection('estadisticas')">Estadísticas</a>
+                <a href="#" onclick="showSection('funciones')">Funciones</a>
+                <a href="#" onclick="showSection('contenido')">Contenido</a>
+                <a href="index.html">Cerrar sesión</a>
+            </nav>
+        </aside>
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Usuarios -->
+            <section id="section-usuarios" class="section">
+                <h2>Gestión de Usuarios</h2>
+                <div class="table-responsive">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Racha Activa</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+                </div>
+            </section>
+            <!-- Estadísticas -->
+            <section id="section-estadisticas" class="section hidden">
+                <h2>Estadísticas Generales</h2>
+                <div id="stats" class="stats-grid"></div>
+                <div class="chart-wrapper">
+                    <canvas id="statsChart" width="350" height="180"></canvas>
+                </div>
+            </section>
+            <!-- Funciones -->
+            <section id="section-funciones" class="section hidden">
+                <h2>Control de Funcionalidades</h2>
+                <div id="featureList" class="features-list"></div>
+            </section>
+            <!-- Contenido -->
+            <section id="section-contenido" class="section hidden">
+                <h2>Gestión y Validación de Contenido</h2>
+                <div class="content-tabs">
+                    <button onclick="showContentSubsection('lecciones')">Lecciones</button>
+                    <button onclick="showContentSubsection('cursos')">Cursos</button>
+                </div>
+                <div id="content-lecciones" class="content-subsection">
+                    <h3>Lecciones</h3>
+                    <!-- Aquí se listan y gestionan las lecciones -->
+                </div>
+                <div id="content-cursos" class="content-subsection hidden">
+                    <h3>Cursos</h3>
+                    <form id="createCourseForm" class="course-form">
+                        <input type="text" name="titulo" placeholder="Título del curso" required>
+                        <input type="text" name="descripcion" placeholder="Descripción breve" required>
+                        <button type="submit" class="btn btn-success">Crear Curso</button>
+                    </form>
+                    <ul id="coursesList"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>
