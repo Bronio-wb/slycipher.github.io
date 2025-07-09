@@ -1,100 +1,123 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- 
+        Metadatos esenciales para compatibilidad y responsividad.
+        Se incluye la fuente 'Segoe UI' por su claridad y modernidad.
+    -->
     <meta charset="UTF-8">
+    <title>SlyCipher - Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlyCipher - Login y Registro</title>
+    <!-- Hoja de estilos principal -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Fuente personalizada desde Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="main-auth-container">
-        <img src="img/Logo.jpeg" alt="Logo SlyCipher" class="logo-main">
-        <h2 class="main-title">SlyCipher</h2>
-        <div class="tabs">
-            <button class="tab-btn active" id="loginTabBtn" onclick="showTab('login')">Iniciar Sesión</button>
-            <button class="tab-btn" id="registerTabBtn" onclick="showTab('register')">Registrarse</button>
-        </div>
-        <div class="tab-content">
-            <!-- LOGIN FORMULARIO -->
-            <form id="loginForm" class="auth-form" autocomplete="off">
-                <h3>Iniciar Sesión</h3>
+    <!-- 
+        Contenedor principal centrado vertical y horizontalmente.
+        Facilita la adaptabilidad y el enfoque visual.
+    -->
+    <div class="login-container">
+        <div class="login-box">
+            <!-- 
+                Logo de la aplicación.
+                Refuerza la identidad visual y profesionalismo.
+            -->
+            <img src="img/Logo.jpeg" alt="Logo SlyCipher" class="logo">
+            
+            <!-- 
+                Botones de pestañas para alternar entre login y registro.
+                Se usa el evento onclick para cambiar de formulario sin recargar la página.
+            -->
+            <div class="tab-buttons">
+                <button id="loginTabBtn" class="active" onclick="showTab('login')">Iniciar sesión</button>
+                <button id="registerTabBtn" onclick="showTab('register')">Registrarse</button>
+            </div>
+            
+            <!-- 
+                Botones de login social.
+                Permiten autenticación rápida (simulada en este demo).
+                Se eligió mostrar ambos para dar opciones modernas y familiares al usuario.
+            -->
+            <div class="social-login">
+                <button type="button" class="btn-social github" onclick="loginWithGithub()">
+                    <img src="img/github_536452.png" alt="GitHub"> Iniciar con GitHub
+                </button>
+                <button type="button" class="btn-social google" onclick="loginWithGoogle()">
+                    <img src="img/logo_google.png" alt="Google"> Iniciar con Google
+                </button>
+            </div>
+            
+            <!-- 
+                Formulario de inicio de sesión.
+                Incluye validación en tiempo real y mensajes de error.
+                Se eligió separar login y registro para simplificar la experiencia.
+            -->
+            <form id="loginForm" class="auth-form">
                 <div class="input-group">
-                    <input type="email" name="email" placeholder="Correo electrónico" required data-validation="email">
-                    <small class="error-message"></small>
+                    <label for="loginEmail">Correo electrónico</label>
+                    <input type="email" id="loginEmail" name="email" data-validation="email" placeholder="ejemplo@tudominio.com" required>
+                    <span class="error-message"></span>
                 </div>
                 <div class="input-group">
-                    <input type="password" name="password" placeholder="Contraseña" required data-validation="password">
-                    <small class="error-message"></small>
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" name="password" data-validation="password" placeholder="Tu contraseña" required>
+                    <span class="error-message"></span>
                 </div>
-                <button type="submit" class="button">Iniciar sesión</button>
-                <p class="auth-switch">¿No tienes cuenta? <span class="register-link" onclick="showTab('register')">Regístrate</span></p>
-                <div class="social-divider"><span>o inicia sesión con</span></div>
-                <div class="social-login">
-                    <button type="button" class="social-btn" title="Google">
-                        <img src="img/logo_google.png" alt="Google" class="icon-social">
-                        Google
-                    </button>
-                    <button type="button" class="social-btn" title="GitHub">
-                        <img src="img/github_536452.png" alt="GitHub" class="icon-social">
-                        GitHub
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-success">Ingresar</button>
             </form>
-            <!-- REGISTRO FORMULARIO -->
-            <form id="registerForm" class="auth-form hidden" autocomplete="off">
-                <h3>Registro de Usuario</h3>
-                <div class="input-row">
-                    <div class="input-group">
-                        <input type="text" name="nombre" placeholder="Nombre" required data-validation="nombre">
-                        <small class="error-message"></small>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" name="apellido" placeholder="Apellido" required data-validation="apellido">
-                        <small class="error-message"></small>
+            
+            <!-- 
+                Formulario de registro (oculto por defecto).
+                Incluye validaciones avanzadas y requisitos de contraseña.
+                Se eligió mostrar requisitos visuales para mejorar la seguridad y la experiencia.
+            -->
+            <form id="registerForm" class="auth-form hidden">
+                <div class="input-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" data-validation="nombre" placeholder="Tu nombre" required>
+                    <span class="error-message"></span>
+                </div>
+                <div class="input-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" data-validation="apellido" placeholder="Tu apellido" required>
+                    <span class="error-message"></span>
+                </div>
+                <div class="input-group">
+                    <label for="registerEmail">Correo electrónico</label>
+                    <input type="email" id="registerEmail" name="email" data-validation="email" placeholder="ejemplo@midominio.com" required>
+                    <span class="error-message"></span>
+                </div>
+                <div class="input-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" name="password" data-validation="password" placeholder="Crea una contraseña" required>
+                    <span class="error-message"></span>
+                    <!-- 
+                        Requisitos de contraseña mostrados dinámicamente.
+                        Mejora la claridad y reduce errores al registrar.
+                    -->
+                    <div id="passwordRequirements">
+                        <small data-req="length">8-20 caracteres</small> · 
+                        <small data-req="uppercase">Mayúscula</small> · 
+                        <small data-req="lowercase">Minúscula</small> · 
+                        <small data-req="number">Número</small> · 
+                        <small data-req="special">Símbolo !@#$%^&*</small>
                     </div>
                 </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <input type="date" name="fecha" required data-validation="fecha">
-                        <small class="error-message"></small>
-                    </div>
-                    <div class="input-group">
-                        <input type="email" name="email" placeholder="Correo electrónico" required data-validation="email">
-                        <small class="error-message"></small>
-                        <div class="help-message" id="emailHelp">
-                            El correo debe tener formato usuario@dominio.com
-                        </div>
-                    </div>
+                <div class="input-group">
+                    <label for="fecha">Fecha de nacimiento</label>
+                    <input type="date" id="fecha" name="fecha" data-validation="fecha" required>
+                    <span class="error-message"></span>
                 </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <input type="password" name="password" placeholder="Contraseña" required data-validation="password" autocomplete="new-password">
-                        <small class="error-message"></small>
-                        <div class="password-requirements" id="passwordRequirements">
-                            <div class="requirement" data-req="length">● Entre 8 y 20 caracteres</div>
-                            <div class="requirement" data-req="uppercase">● Al menos una letra mayúscula (A-Z)</div>
-                            <div class="requirement" data-req="lowercase">● Al menos una letra minúscula (a-z)</div>
-                            <div class="requirement" data-req="number">● Al menos un número (0-9)</div>
-                            <div class="requirement" data-req="special">● Al menos un carácter especial (!@#$%^&*)</div>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="button">Registrarse</button>
-                <p class="auth-switch">¿Ya tienes cuenta? <span class="login-link" onclick="showTab('login')">Inicia sesión</span></p>
-                <div class="social-divider"><span>o regístrate con</span></div>
-                <div class="social-login">
-                    <button type="button" class="social-btn" title="Google">
-                        <img src="img/logo_google.png" alt="Google" class="icon-social">
-                        Google
-                    </button>
-                    <button type="button" class="social-btn" title="GitHub">
-                        <img src="img/github_536452.png" alt="GitHub" class="icon-social">
-                        GitHub
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-success">Registrarse</button>
             </form>
         </div>
     </div>
+    <!-- 
+        Script principal que gestiona la lógica de pestañas, validaciones y simulación de login/registro.
+        Se coloca al final para asegurar que el DOM esté cargado antes de ejecutarse.
+    -->
     <script src="script.js"></script>
 </body>
 </html>
