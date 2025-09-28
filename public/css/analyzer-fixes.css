@@ -1,0 +1,80 @@
+/* CSS personalizado para resolver problemas del analizador */
+
+/* Variables CSS para colores dinámicos */
+:root {
+    --categoria-color: #007bff;
+    --lenguaje-color: #000000;
+    --progreso-width: 0%;
+}
+
+/* Estilos para elementos dinámicos */
+.categoria-icon {
+    color: var(--categoria-color);
+}
+
+.categoria-color-badge,
+.categoria-color-display {
+    background-color: var(--categoria-color) !important;
+    color: white !important;
+}
+
+.lenguaje-color-circle {
+    background-color: var(--lenguaje-color);
+}
+
+.leccion-progress-bar {
+    width: var(--progreso-width);
+}
+
+/* Estilos para validación de formularios */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.form-control:not(.is-invalid),
+.form-select:not(.is-invalid) {
+    border-color: #d1d5db !important;
+}
+
+/* Compatibilidad Tailwind - Evitar conflictos */
+.border-conditional {
+    border-width: 1px;
+    border-style: solid;
+}
+
+.border-conditional.has-error {
+    border-color: #ef4444 ! important; /* red-500 */
+}
+
+.border-conditional:not(.has-error) {
+    border-color: #d1d5db !important; /* gray-300 */
+}
+
+/* Estilos para badges de roles */
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.role-badge.admin {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+.role-badge.developer {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+
+.role-badge.student {
+    background-color: #f0fdf4;
+    color: #166534;
+}
+
+.role-badge.default {
+    background-color: #f9fafb;
+    color: #374151;
+}

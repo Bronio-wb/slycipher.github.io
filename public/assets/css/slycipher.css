@@ -1,0 +1,365 @@
+/* SLYCIPHER - Estilos Personalizados */
+
+/* Variables CSS */
+:root {
+    --slycipher-primary: #007bff;
+    --slycipher-secondary: #6c757d;
+    --slycipher-success: #28a745;
+    --slycipher-danger: #dc3545;
+    --slycipher-warning: #ffc107;
+    --slycipher-info: #17a2b8;
+    --slycipher-light: #f8f9fa;
+    --slycipher-dark: #343a40;
+    --slycipher-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Estilos Generales */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--slycipher-dark);
+}
+
+.slycipher-gradient {
+    background: var(--slycipher-gradient);
+    color: white;
+}
+
+/* Header y Navegación */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    transform: translateY(-1px);
+    color: var(--slycipher-primary) !important;
+}
+
+/* Cards Personalizadas */
+.slycipher-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    transition: all 0.3s ease;
+}
+
+.slycipher-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.slycipher-card .card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: none;
+    font-weight: 600;
+}
+
+/* Botones Personalizados */
+.btn-slycipher {
+    background: var(--slycipher-gradient);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.625rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-slycipher:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.btn-outline-slycipher {
+    border: 2px solid var(--slycipher-primary);
+    color: var(--slycipher-primary);
+    background: transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-slycipher:hover {
+    background: var(--slycipher-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Badges de Estado */
+.badge-progreso { background-color: #007bff; }
+.badge-desafio { background-color: #ffc107; color: #000; }
+.badge-tiempo { background-color: #17a2b8; }
+.badge-especial { background-color: #28a745; }
+
+.badge-principiante { background-color: #28a745; }
+.badge-intermedio { background-color: #ffc107; color: #000; }
+.badge-avanzado { background-color: #fd7e14; }
+.badge-experto { background-color: #dc3545; }
+
+/* Tablas Responsivas */
+.table-slycipher {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table-slycipher thead th {
+    background: var(--slycipher-gradient);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem 0.75rem;
+}
+
+.table-slycipher tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table-slycipher tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
+}
+
+/* Formularios */
+.form-control:focus {
+    border-color: var(--slycipher-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--slycipher-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-floating > label {
+    color: var(--slycipher-secondary);
+}
+
+/* Alertas Personalizadas */
+.alert-slycipher {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    color: var(--slycipher-dark);
+}
+
+/* Elementos de Progreso */
+.progress-slycipher {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+.progress-slycipher .progress-bar {
+    background: var(--slycipher-gradient);
+    border-radius: 4px;
+}
+
+/* Código */
+.code-block {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.code-inline {
+    background-color: #f1f3f4;
+    color: #e74c3c;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875em;
+}
+
+/* Estadísticas */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--slycipher-primary);
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--slycipher-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Logros */
+.logro-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.logro-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--slycipher-gradient);
+}
+
+.logro-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.logro-obtenido {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #744210;
+}
+
+/* Loading y Spinners */
+.slycipher-spinner {
+    border: 3px solid rgba(102, 126, 234, 0.3);
+    border-top: 3px solid var(--slycipher-primary);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Utilidades */
+.text-slycipher { color: var(--slycipher-primary) !important; }
+.bg-slycipher { background-color: var(--slycipher-primary) !important; }
+.border-slycipher { border-color: var(--slycipher-primary) !important; }
+
+.shadow-slycipher {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07) !important;
+}
+
+.shadow-slycipher-lg {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .slycipher-card {
+        margin-bottom: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-slycipher {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .code-block {
+        padding: 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+/* Dark Mode (para futuras implementaciones) */
+@media (prefers-color-scheme: dark) {
+    .slycipher-dark-mode {
+        background-color: #1a202c;
+        color: #e2e8f0;
+    }
+    
+    .slycipher-dark-mode .slycipher-card {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .btn, .navbar, .sidebar, .no-print {
+        display: none !important;
+    }
+    
+    .slycipher-card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}
