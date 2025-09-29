@@ -1,0 +1,33 @@
+{
+    "files.associations": {
+        "*.blade.php": "blade"
+    },
+    "emmet.includeLanguages": {
+        "blade": "html"
+    },
+    "blade.format.enable": true,
+    "html.format.enable": true,
+    "css.validate": false,
+    "scss.validate": false,
+    "less.validate": false,
+    "html.validate.styles": false,
+    "css.lint.unknownAtRules": "ignore",
+    "css.lint.propertyIgnoredDueToDisplay": "ignore",
+    "css.lint.duplicateProperties": "ignore",
+    "[blade]": {
+        "editor.autoClosingBrackets": "always",
+        "editor.suggest.insertMode": "replace"
+    },
+    "html.customData": [
+        ".vscode/html.html-data.json"
+    ],
+    "css.customData": [
+        ".vscode/css.css-data.json"
+    ],
+    "problems.decorations.enabled": false,
+    "blade.spacesAfterDirectives": true,
+    "laravel_goto_view.folders": {
+        "default": "resources/views",
+        "vendor": "resources/views/vendor"
+    }
+}

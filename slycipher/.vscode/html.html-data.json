@@ -1,0 +1,33 @@
+{
+    "version": 1.1,
+    "tags": [
+        {
+            "name": "div",
+            "attributes": [
+                {
+                    "name": "style",
+                    "valueSet": "style"
+                }
+            ]
+        }
+    ],
+    "valueSets": [
+        {
+            "name": "style",
+            "values": [
+                {
+                    "name": "background-color: {{ $variable }}",
+                    "description": "Dynamic background color from Blade variable"
+                },
+                {
+                    "name": "color: {{ $variable }}",
+                    "description": "Dynamic color from Blade variable"
+                },
+                {
+                    "name": "width: {{ $variable }}%",
+                    "description": "Dynamic width from Blade variable"
+                }
+            ]
+        }
+    ]
+}
