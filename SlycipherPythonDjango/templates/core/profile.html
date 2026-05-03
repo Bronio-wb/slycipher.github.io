@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mi Perfil | SLYCIPHER</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="{% static 'images/logo.png' %}" alt="logo">
+      <span>SLYCIPHER</span>
+      <span class="pill">{{ panel_label }}</span>
+    </div>
+    <div class="topbar-right">
+      <span>Bienvenido, <strong>{{ request.user.username }}</strong></span>
+      <a href="/logout/">Cerrar Sesión</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      {% if role_key == 'ADMIN' %}
+        <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+        <a href="{% url 'core:users' %}">Usuarios</a>
+        <a href="{% url 'core:admin_courses' %}">Cursos</a>
+        <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+        <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      {% elif role_key == 'DEVELOPER' %}
+        <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+        <a href="{% url 'core:developer_course_create' %}"><i class="bi bi-plus-circle"></i> Crear Curso</a>
+      {% else %}
+        <a href="{% url 'core:student_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="{% url 'core:student_courses' %}"><i class="bi bi-book"></i> Cursos</a>
+      {% endif %}
+      <a href="{% url 'core:profile' %}" class="active"><i class="bi bi-person-circle"></i> Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <section class="hero-card">
+        <div class="avatar-wrap">
+          <img src="{% static 'images/logo.png' %}" alt="avatar">
+        </div>
+        <div class="hero-content">
+          <h1>{{ display_name }}</h1>
+          <p>@{{ request.user.username }}</p>
+          <span class="role-badge role-{{ role_key|lower }}">{{ role_label }}</span>
+        </div>
+        <div class="completion">
+          <span class="completion-label">Perfil completado</span>
+          <span class="completion-value">{{ profile_completion }}%</span>
+          <div class="progress-bar">
+            <div class="progress-fill" data-progress="{{ profile_completion }}"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Información de la cuenta</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span>Email</span>
+              <strong>{{ request.user.email|default:'No registrado' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Nombre</span>
+              <strong>{{ request.user.nombre|default:'-' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Apellido</span>
+              <strong>{{ request.user.apellido|default:'-' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Miembro desde</span>
+              <strong>{{ member_since|date:'d/m/Y'|default:'Sin registro' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Último acceso</span>
+              <strong>{{ request.user.last_login|date:'d/m/Y H:i'|default:'Sin registro' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Rol</span>
+              <strong>{{ role_label }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Datos de perfil</h2>
+          <div class="info-grid compact">
+            <div class="info-item">
+              <span>Tipo documento</span>
+              <strong>{{ profile.tipo_documento|default:'No registrado' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Número documento</span>
+              <strong>{{ profile.numero_documento|default:'No registrado' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Fecha de nacimiento</span>
+              <strong>{{ birth_date|date:'d/m/Y'|default:'No registrada' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Racha</span>
+              <strong>{{ streak_days|default:'0' }} días</strong>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary" href="{% url dashboard_route %}">Volver al panel</a>
+            <a class="btn btn-light" href="/logout/">Cerrar sesión</a>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressElement = document.querySelector('.progress-fill');
+    if (progressElement) {
+      const progressValue = Number(progressElement.dataset.progress || 0);
+      progressElement.style.width = `${Math.max(0, Math.min(100, progressValue))}%`;
+    }
+  </script>
+</body>
+</html>

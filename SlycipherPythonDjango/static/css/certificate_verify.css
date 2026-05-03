@@ -1,0 +1,150 @@
+:root {
+  --navy: #263847;
+  --orange: #ff6b35;
+  --cream: #fff7ed;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #dbe4ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 107, 53, 0.16), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(38, 56, 71, 0.18), transparent 32%),
+    #f8fafc;
+}
+
+.verify-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.verify-card {
+  width: min(920px, 100%);
+  background: rgba(255, 247, 237, 0.94);
+  border: 2px solid var(--navy);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.16);
+  position: relative;
+  overflow: hidden;
+}
+
+.verify-card::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border: 3px solid var(--orange);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.verify-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.verify-brand img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.verify-kicker {
+  margin: 0 0 6px;
+  font: 700 12px/1.2 Arial, sans-serif;
+  letter-spacing: 0.24em;
+  color: var(--orange);
+}
+
+.verify-brand h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1;
+  color: var(--navy);
+}
+
+.verify-status {
+  margin: 28px 0 22px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  font: 700 14px/1.2 Arial, sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+.verify-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.verify-block {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.verify-label {
+  display: block;
+  margin-bottom: 8px;
+  font: 700 12px/1.2 Arial, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.verify-block strong {
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.verify-note {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font: 400 15px/1.7 Arial, sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 760px) {
+  .verify-shell {
+    padding: 18px;
+  }
+
+  .verify-card {
+    padding: 24px;
+  }
+
+  .verify-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .verify-brand {
+    align-items: flex-start;
+  }
+}

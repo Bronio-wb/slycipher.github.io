@@ -1,0 +1,13 @@
+/* Simple styling to make pages readable */
+:root{--max-width:900px}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:#fafafa;color:#111;margin:0}
+.container{max-width:var(--max-width);margin:2rem auto;padding:0 1rem}
+.site-header{background:#fff;border-bottom:1px solid #eee;padding:1rem 0}
+.site-header .brand{display:inline-block;margin:0;font-size:1.25rem}
+.site-header nav{display:inline-block;float:right}
+.site-header a{color:#1a73e8;text-decoration:none;margin-left:.5rem}
+.hero{padding:1rem 0}
+.card{background:#fff;border:1px solid #eee;padding:1rem;margin-top:1rem;border-radius:6px}
+h1,h2,h3{margin:0 0 .5rem}
+ul{margin:0.5rem 0 1rem 1.2rem}
+footer.site-footer{padding:1rem 0;text-align:center;color:#666;margin-top:2rem}

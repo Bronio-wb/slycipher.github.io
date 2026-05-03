@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SLYCIPHER Admin Dashboard</title>
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}" class="active">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="#">Lecciones</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+    <main class="main">
+      <h1>Dashboard de Administración</h1>
+
+      {% if messages %}
+      <div class="alerts-wrap">
+        {% for message in messages %}
+          <div class="alert-item alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="cards">
+            <div class="card stat-card">
+              <div class="card-header-flex">
+                <div>
+                  <h3>Total Usuarios</h3>
+                  <p class="stat-number stat-blue">{{ total_users }}</p>
+                </div>
+                <div class="stat-icon">👥</div>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="card-header-flex">
+                <div>
+                  <h3>Total Cursos</h3>
+                  <p class="stat-number stat-dark">{{ total_courses }}</p>
+                </div>
+                <div class="stat-icon">📚</div>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="card-header-flex">
+                <div>
+                  <h3>Usuarios Activos</h3>
+                  <p class="stat-number stat-blue">{{ active_users }}</p>
+                </div>
+                <div class="stat-icon">✅</div>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="card-header-flex">
+                <div>
+                  <h3>Cursos Activos</h3>
+                  <p class="stat-number stat-orange">{{ active_courses }}</p>
+                </div>
+                <div class="stat-icon">🚀</div>
+              </div>
+            </div>
+      </div>
+
+      <div class="content">
+        <div class="panel">
+          <h3>Usuarios Recientes</h3>
+          <table>
+            <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th></tr></thead>
+            <tbody>
+              {% for u in recent_users %}
+              <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                  {% if 'admin' in u.role|lower %}
+                    <span class="badge badge-dark">Admin</span>
+                  {% elif 'desar' in u.role|lower %}
+                    <span class="badge badge-orange">Desarrollador</span>
+                  {% else %}
+                    <span class="badge badge-blue">Estudiante</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if u.is_active %}
+                    <span class="status status-active">✔ Activo</span>
+                  {% else %}
+                    <span class="status status-inactive">✖ Inactivo</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel chart-panel">
+          <h3>Distribución por Roles</h3>
+          <div class="chart">
+            <svg width="260" height="260" viewBox="0 0 42 42" class="donut">
+              <g transform="translate(21,21)">
+                <circle r="15.9155" fill="transparent" stroke="#e5e7eb" stroke-width="6"></circle>
+                {% comment %} render segments from context role_segments {% endcomment %}
+                {% for seg in role_segments %}
+                  <circle r="15.9155" fill="transparent" stroke="{{ seg.color }}" stroke-width="6" stroke-dasharray="{{ seg.dasharray }}" stroke-dashoffset="{{ seg.dashoffset }}" data-label="{{ seg.label }}" data-value="{{ seg.value }}"></circle>
+                {% endfor %}
+                <circle r="10" fill="white"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="legend-row">
+            {% for seg in role_segments %}
+              <div><span class="legend-swatch {{ seg.swatch_class }}"></span> {{ seg.label }} ({{ seg.value }})</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="panel seed-panel admin-certifications-shortcut">
+        <h3>Certificaciones</h3>
+        <p class="seed-help">La gestión de certificados ahora está organizada en un panel independiente para revisar elegibles, historial y emitir PDFs por estudiante o por curso.</p>
+        <a href="{% url 'core:admin_certifications' %}" class="seed-btn primary">Abrir panel de certificaciones</a>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="donut-tooltip" id="donutTooltip"></div>
+  <script>
+    (function () {
+      const tooltip = document.getElementById('donutTooltip');
+      document.querySelectorAll('.donut circle[data-label]').forEach(function (circle) {
+        circle.addEventListener('mouseenter', function (e) {
+          tooltip.textContent = circle.dataset.label + ': ' + circle.dataset.value + ' usuario' + (parseInt(circle.dataset.value) !== 1 ? 's' : '');
+          tooltip.style.opacity = '1';
+        });
+        circle.addEventListener('mousemove', function (e) {
+          tooltip.style.left = (e.clientX + 14) + 'px';
+          tooltip.style.top = (e.clientY - 36) + 'px';
+        });
+        circle.addEventListener('mouseleave', function () {
+          tooltip.style.opacity = '0';
+        });
+      });
+    })();
+
+  </script>
+</body>
+</html>

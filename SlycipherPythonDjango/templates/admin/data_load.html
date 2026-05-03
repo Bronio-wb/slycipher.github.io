@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Carga Masiva - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="#">Lecciones</a>
+      <a href="{% url 'core:admin_data_load' %}" class="active">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <h1>Carga Inicial y Masiva de Datos</h1>
+
+      {% if messages %}
+      <div class="alerts-wrap">
+        {% for message in messages %}
+          <div class="alert-item alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="panel seed-panel">
+        <p class="seed-help">
+          Usa esta sección para poblar catálogos base del sistema (categorías, lenguajes y logros)
+          o para cargar datos masivos desde un archivo JSON.
+        </p>
+
+        <div class="seed-grid">
+          <form method="post" class="seed-form">
+            {% csrf_token %}
+            <input type="hidden" name="seed_action" value="initial">
+            <h4>Carga inicial recomendada</h4>
+            <p>Inserta datos mínimos para iniciar operación sin depender de scripts externos.</p>
+            <label class="seed-check">
+              <input type="checkbox" name="update_existing" value="1">
+              Actualizar registros existentes cuando haya cambios
+            </label>
+            <button type="submit" class="seed-btn primary">Ejecutar carga inicial</button>
+          </form>
+
+          <form method="post" enctype="multipart/form-data" class="seed-form" id="bulkSeedForm">
+            {% csrf_token %}
+            <input type="hidden" name="seed_action" value="bulk_json">
+            <h4>Carga masiva por JSON</h4>
+            <p>Sube un archivo con claves <strong>categorias</strong>, <strong>lenguajes</strong> y <strong>logros</strong>.</p>
+            <input type="file" id="seedFileInput" name="seed_file" accept="application/json,.json" required>
+            <div id="seedFileStatus" class="seed-file-status status-neutral">Selecciona un archivo para validar su estructura.</div>
+            <label class="seed-check">
+              <input type="checkbox" name="update_existing" value="1">
+              Actualizar registros existentes cuando coincida nombre
+            </label>
+            <button type="submit" class="seed-btn" id="seedSubmitBtn" disabled>Cargar archivo JSON</button>
+          </form>
+        </div>
+
+        <pre class="seed-example">{
+  "categorias": [{"nombre": "Backend", "descripcion": "Servicios y APIs"}],
+  "lenguajes": [{"nombre": "Python", "descripcion": "Programacion general"}],
+  "logros": [{
+    "nombre": "Primer logro",
+    "descripcion": "Completa tu primera leccion",
+    "icono": "fa-seedling",
+    "puntos_requeridos": 1,
+    "tipo": "lecciones",
+    "activo": true
+  }]
+}</pre>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('bulkSeedForm');
+      const fileInput = document.getElementById('seedFileInput');
+      const submitBtn = document.getElementById('seedSubmitBtn');
+      const statusEl = document.getElementById('seedFileStatus');
+
+      if (!form || !fileInput || !submitBtn || !statusEl) {
+        return;
+      }
+
+      function setStatus(text, cssClass, canSubmit) {
+        statusEl.textContent = text;
+        statusEl.className = 'seed-file-status ' + cssClass;
+        submitBtn.disabled = !canSubmit;
+      }
+
+      function isObject(value) {
+        return value !== null && typeof value === 'object' && !Array.isArray(value);
+      }
+
+      function validatePayloadShape(payload) {
+        if (!isObject(payload)) {
+          return 'El JSON debe tener un objeto principal.';
+        }
+
+        const requiredKeys = ['categorias', 'lenguajes', 'logros'];
+        for (let i = 0; i < requiredKeys.length; i += 1) {
+          const key = requiredKeys[i];
+          if (!Object.prototype.hasOwnProperty.call(payload, key)) {
+            return 'Falta la clave obligatoria: ' + key + '.';
+          }
+          if (!Array.isArray(payload[key])) {
+            return 'La clave ' + key + ' debe contener una lista.';
+          }
+        }
+
+        for (let i = 0; i < payload.categorias.length; i += 1) {
+          const item = payload.categorias[i];
+          if (!isObject(item) || !String(item.nombre || '').trim()) {
+            return 'Cada categoria debe incluir el campo nombre.';
+          }
+        }
+
+        for (let i = 0; i < payload.lenguajes.length; i += 1) {
+          const item = payload.lenguajes[i];
+          if (!isObject(item) || !String(item.nombre || '').trim()) {
+            return 'Cada lenguaje debe incluir el campo nombre.';
+          }
+        }
+
+        for (let i = 0; i < payload.logros.length; i += 1) {
+          const item = payload.logros[i];
+          if (!isObject(item) || !String(item.nombre || '').trim()) {
+            return 'Cada logro debe incluir el campo nombre.';
+          }
+        }
+
+        return '';
+      }
+
+      fileInput.addEventListener('change', function () {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+          setStatus('Selecciona un archivo para validar su estructura.', 'status-neutral', false);
+          return;
+        }
+
+        const maxSize = 2 * 1024 * 1024;
+        if (file.size > maxSize) {
+          setStatus('El archivo supera el limite de 2 MB.', 'status-error', false);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          try {
+            const rawText = String(event.target && event.target.result ? event.target.result : '');
+            const parsed = JSON.parse(rawText);
+            const shapeError = validatePayloadShape(parsed);
+
+            if (shapeError) {
+              setStatus(shapeError, 'status-error', false);
+              return;
+            }
+
+            setStatus(
+              'Archivo valido: ' + parsed.categorias.length + ' categorias, ' +
+              parsed.lenguajes.length + ' lenguajes y ' + parsed.logros.length + ' logros.',
+              'status-success',
+              true
+            );
+          } catch (error) {
+            setStatus('El contenido no es un JSON valido.', 'status-error', false);
+          }
+        };
+
+        reader.onerror = function () {
+          setStatus('No fue posible leer el archivo seleccionado.', 'status-error', false);
+        };
+
+        reader.readAsText(file, 'utf-8');
+      });
+
+      form.addEventListener('submit', function (event) {
+        if (submitBtn.disabled) {
+          event.preventDefault();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

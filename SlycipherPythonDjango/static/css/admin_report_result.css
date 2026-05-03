@@ -1,0 +1,35 @@
+:root{--bg:#f8fafc;--line:#e5e7eb;--brand:#263847;--accent:#ff6b35;--muted:#6b7280}
+body{font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);margin:0;color:#111827}
+.topbar{height:64px;background:var(--brand);color:#fff;display:flex;align-items:center;padding:0 20px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700}.brand img{width:36px;height:36px;border-radius:8px}
+.pill{background:var(--accent);padding:5px 8px;border-radius:10px;font-size:12px}
+.logout{margin-left:auto}.logout a{color:#fff;text-decoration:none;background:#dc2626;padding:6px 10px;border-radius:8px}
+.layout{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--line);padding:24px}
+.sidebar a{display:block;padding:10px 12px;color:#111;text-decoration:none;border-radius:8px;margin-bottom:6px}.sidebar a.active{background:#ffedd5;color:#c2410c;font-weight:600}
+.main{flex:1;padding:28px}
+.header-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.header-actions h1{margin:0}
+.actions{display:flex;gap:10px}.actions button,.actions a{background:var(--brand);color:#fff;border:none;padding:9px 12px;border-radius:8px;text-decoration:none;cursor:pointer}.actions a{background:var(--brand)}
+.card-title{background:#fff;padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);margin-bottom:12px}.card-title h2{margin:0 0 6px}.card-title p{margin:0;color:var(--muted)}
+.filters-box{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px}.filters-box h3{margin:0 0 8px;font-size:14px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#eff6ff;color:#1d4ed8;padding:5px 10px;border-radius:999px;font-size:12px}
+.table-wrap{background:#fff;padding:14px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.badge{background:#f3f4f6;border-radius:999px;padding:4px 8px;font-size:12px}.ok{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:999px;font-size:12px}.off{background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:999px;font-size:12px}
+.empty{text-align:center;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#fff;padding:18px;border-radius:12px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.05)}.kpi span{font-size:32px;font-weight:700;display:block}.kpi small{color:var(--muted)}
+.report-user-kpis{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:12px}
+.progress-report-wrap{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.progress-title{margin:0 0 8px;color:var(--brand);font-size:40px;line-height:1.15}
+.progress-divider{height:1px;background:#d3dde5;margin-bottom:20px}
+.progress-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-bottom:28px}
+.progress-kpi{border:1px solid #cfcfcf;padding:20px 12px;text-align:center;background:#fff}
+.progress-kpi span{display:block;font-size:52px;font-weight:800;color:var(--brand);line-height:1.05}
+.progress-kpi small{display:block;font-size:32px;color:#1f2937;line-height:1.2;margin-top:8px}
+.progress-subtitle{margin:0 0 14px;color:var(--brand);font-size:40px;line-height:1.15}
+.progress-table-wrap{box-shadow:none;padding:0;background:transparent}
+.progress-table th{background:var(--brand);color:#fff;font-size:30px;text-transform:none;letter-spacing:0}
+.progress-table td{font-size:31px;color:#111827;border-bottom:1px solid #2f2f2f}
+.progress-table th,.progress-table td{border:1px solid #2f2f2f;padding:8px 10px}
+@media (max-width:900px){.sidebar{display:none}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.progress-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.progress-title,.progress-subtitle{font-size:30px}.progress-kpi span{font-size:40px}.progress-kpi small{font-size:24px}.progress-table th{font-size:22px}.progress-table td{font-size:20px}}
+@media print{.topbar,.sidebar,.actions{display:none}.layout{display:block}.main{padding:0}}

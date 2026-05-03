@@ -1,0 +1,340 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafíos | Slycipher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f5f7fa; }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: white;
+            border-right: 1px solid #e0e0e0;
+        }
+        .sidebar .nav-link {
+            color: #6c757d;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #ffe5d9;
+            color: #ff6b35;
+        }
+        .sidebar .nav-link.active {
+            background-color: #ffe5d9;
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stats-card-dark {
+            background: linear-gradient(135deg, #2c3a51 0%, #1a2332 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .stats-card-orange {
+            background-color: #ff6b35;
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .desafio-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .desafio-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .badge-facil   { background-color: #4a9fe5 !important; }
+        .badge-medio   { background-color: #ff6b35 !important; }
+        .badge-dificil { background-color: #2c3a51 !important; }
+        .challenge-action-btn { color: white; }
+        .challenge-action-btn.is-completed { background-color: #28a745; }
+        .challenge-action-btn.is-pending { background-color: #ff6b35; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark sticky-top" style="background-color: #ff6b35;">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Slycipher"
+                     style="width:30px;height:30px;margin-right:10px;object-fit:contain;"
+                     onerror="this.style.display='none'">
+                SLYCIPHER Student
+            </a>
+            <div class="d-flex align-items-center text-white">
+                <span class="me-3">Hola, <strong>{{ username }}</strong></span>
+                <span class="badge bg-warning text-dark me-3">
+                    <i class="bi bi-fire"></i> Racha: {{ racha }} días
+                </span>
+                <form action="{% url 'core:logout' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_dashboard' %}">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_courses' %}">
+                                <i class="bi bi-book"></i> Cursos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'core:student_challenges' %}">
+                                <i class="bi bi-trophy"></i> Desafíos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_progress' %}">
+                                <i class="bi bi-graph-up"></i> Mi Progreso
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_achievements' %}">
+                                <i class="bi bi-award"></i> Logros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:profile' %}">
+                                <i class="bi bi-person-circle"></i> Mi Perfil
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+                <h2 class="mb-4">
+                    <i class="bi bi-trophy" style="color:#ff6b35;"></i> Desafíos
+                </h2>
+
+                <!-- Flash messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Stats overview -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="stats-card-dark">
+                            <h5><i class="bi bi-list-check"></i> Desafíos Disponibles</h5>
+                            <h1 class="mb-0">{{ desafios_disponibles }}</h1>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stats-card-orange">
+                            <h5><i class="bi bi-check-circle"></i> Desafíos Completados</h5>
+                            <h1 class="mb-0">{{ desafios_completados }}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Challenge list -->
+                <div class="card-custom p-4">
+                    <h4 class="mb-3">Desafíos Disponibles</h4>
+
+                    {% if desafios %}
+                        {% for desafio in desafios %}
+                            {% with cid=desafio.challenge_id|stringformat:"s" %}
+                            <div class="desafio-card">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                         style="width:60px;height:60px;background-color:#ffe5d9;flex-shrink:0;">
+                                        <img src="{% static 'images/logo.png' %}" alt="Desafío"
+                                             style="width:44px;height:44px;object-fit:contain;"
+                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                        <i class="bi bi-trophy-fill fs-2" style="color:#ff6b35;display:none;"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-1">{{ desafio.titulo|default:"Sin título" }}</h5>
+                                                {% if desafio.descripcion %}
+                                                    <p class="text-muted mb-2">{{ desafio.descripcion }}</p>
+                                                {% endif %}
+
+                                                <!-- Status badge for submitted challenges -->
+                                                {% if cid in completados_map %}
+                                                    {% with sub=completados_map|dictsort:"0" %}{% endwith %}
+                                                    {% with sub=completados_map %}
+                                                        {% with entry=sub|default_if_none:"" %}
+                                                        {% endwith %}
+                                                    {% endwith %}
+                                                    {# Accede a la entrada directamente #}
+                                                    {% for key, val in completados_map.items %}
+                                                        {% if key == cid %}
+                                                            {% if val.estado == "aprobado" or val.estado == "completado" %}
+                                                                <div class="alert alert-success py-2 px-3 mb-2"
+                                                                     style="border-left:4px solid #28a745;background-color:#d4edda;">
+                                                                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                                                                        <strong>
+                                                                            <i class="bi bi-trophy-fill text-success"></i>
+                                                                            ¡Desafío Completado!
+                                                                        </strong>
+                                                                        {% if val.puntaje %}
+                                                                            <small class="text-success">
+                                                                                <i class="bi bi-star-fill"></i>
+                                                                                Puntaje: <strong>{{ val.puntaje }}</strong>
+                                                                            </small>
+                                                                        {% endif %}
+                                                                        {% if val.evaluado_en %}
+                                                                            <small class="text-success">
+                                                                                <i class="bi bi-calendar-check"></i>
+                                                                                Completado: {{ val.evaluado_en }}
+                                                                            </small>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            {% elif val.estado == "pendiente" %}
+                                                                <div class="alert alert-warning py-2 px-3 mb-2"
+                                                                     style="border-left:4px solid #ffc107;background-color:#fff3cd;">
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <i class="bi bi-clock-history text-warning"></i>
+                                                                        <strong>Solución Pendiente de Revisión</strong>
+                                                                        {% if val.enviado_en %}
+                                                                            <span class="mx-2">|</span>
+                                                                            <small class="text-warning">
+                                                                                <i class="bi bi-calendar"></i>
+                                                                                Enviado: {{ val.enviado_en }}
+                                                                            </small>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            {% elif val.estado == "rechazado" %}
+                                                                <div class="alert alert-danger py-2 px-3 mb-2"
+                                                                     style="border-left:4px solid #dc3545;background-color:#f8d7da;">
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <i class="bi bi-x-circle text-danger"></i>
+                                                                        <strong>Solución Rechazada</strong>
+                                                                        {% if val.evaluado_en %}
+                                                                            <span class="mx-2">|</span>
+                                                                            <small class="text-danger">
+                                                                                <i class="bi bi-calendar-x"></i>
+                                                                                Revisado: {{ val.evaluado_en }}
+                                                                            </small>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Right column: difficulty + status badges -->
+                                            <div class="d-flex flex-column gap-2 align-items-end ms-3">
+                                                {% if desafio.dificultad %}
+                                                    {% if desafio.dificultad == "Fácil" or desafio.dificultad == "Facil" %}
+                                                        <span class="badge badge-facil text-white">{{ desafio.dificultad }}</span>
+                                                    {% elif desafio.dificultad == "Difícil" or desafio.dificultad == "Dificil" %}
+                                                        <span class="badge badge-dificil text-white">{{ desafio.dificultad }}</span>
+                                                    {% else %}
+                                                        <span class="badge badge-medio text-white">{{ desafio.dificultad }}</span>
+                                                    {% endif %}
+                                                {% endif %}
+
+                                                {% if cid in completados_map %}
+                                                    {% for key, val in completados_map.items %}
+                                                        {% if key == cid %}
+                                                            {% if val.estado == "aprobado" or val.estado == "completado" %}
+                                                                <span class="badge" style="background-color:#28a745;">
+                                                                    <i class="bi bi-check-circle-fill"></i> Completado
+                                                                </span>
+                                                            {% elif val.estado == "pendiente" %}
+                                                                <span class="badge" style="background-color:#ffc107;color:#000;">
+                                                                    <i class="bi bi-clock-history"></i> Pendiente
+                                                                </span>
+                                                            {% elif val.estado == "rechazado" %}
+                                                                <span class="badge" style="background-color:#dc3545;">
+                                                                    <i class="bi bi-x-circle-fill"></i> Rechazado
+                                                                </span>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer row -->
+                                        <div class="d-flex align-items-center justify-content-between mt-2">
+                                            <small class="text-muted">
+                                                {% if desafio.course_id %}
+                                                    <i class="bi bi-book"></i> Curso ID: {{ desafio.course_id }}
+                                                {% else %}
+                                                    <i class="bi bi-lightning"></i> Desafío independiente
+                                                {% endif %}
+                                            </small>
+                                            <div class="d-flex gap-2">
+                                                <a href="{% url 'core:student_challenge_detail' desafio.challenge_id %}"
+                                                                    class="btn btn-sm challenge-action-btn {% if cid in completados_map %}is-completed{% else %}is-pending{% endif %}">
+                                                    <i class="bi {% if cid in completados_map %}bi-eye-fill{% else %}bi-play-circle{% endif %}"></i>
+                                                    {% if cid in completados_map %}Ver Solución{% else %}Intentar Desafío{% endif %}
+                                                </a>
+                                                {% if desafio.course_id %}
+                                                    <a href="{% url 'core:student_course_detail' desafio.course_id %}"
+                                                       class="btn btn-sm btn-outline-secondary">
+                                                        <i class="bi bi-book"></i> Ver Curso
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+
+                    {% else %}
+                        <!-- Empty state -->
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-trophy display-1" style="color:#dee2e6;"></i>
+                            </div>
+                            <h5 class="text-muted">¡Próximamente!</h5>
+                            <p class="text-muted">Los desafíos estarán disponibles pronto para que pongas a prueba tus habilidades.</p>
+                            <a href="{% url 'core:student_courses' %}" class="btn mt-3" style="background-color:#ff6b35;color:white;">
+                                <i class="bi bi-book"></i> Explorar Cursos
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

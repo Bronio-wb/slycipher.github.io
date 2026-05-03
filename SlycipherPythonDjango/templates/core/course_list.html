@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cursos</title>
+  </head>
+  <body>
+    <h1>Cursos</h1>
+    <p><a href="{% url 'core:course_create' %}">Crear nuevo curso</a></p>
+    <ul>
+      {% for c in courses %}
+        <li>
+          <a href="{% url 'core:course_detail' c.pk %}">{{ c.title }}</a>
+          - <a href="{% url 'core:course_update' c.pk %}">Editar</a>
+          - <a href="{% url 'core:course_delete' c.pk %}">Eliminar</a>
+        </li>
+      {% empty %}
+        <li>No hay cursos.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

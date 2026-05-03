@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% if create %}Nuevo Usuario{% else %}Editar Usuario{% endif %}</title>
+  <link rel="stylesheet" href="{% static 'css/admin_user_form.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}" class="active">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+    </aside>
+    <main class="main">
+      <div class="header-row">
+        <h1 class="page-title">{% if create %}Nuevo Usuario{% else %}✏️ Editar Usuario{% endif %}</h1>
+        <a href="{% url 'core:users' %}" class="btn btn-cancel">← Volver</a>
+      </div>
+
+      <div class="card">
+        <form method="post" autocomplete="off">
+          {% csrf_token %}
+          {{ form.username }}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="{% if 'success' in message.tags %}success-banner{% else %}error-text{% endif %}" style="margin-bottom:12px; display:block;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          {% if form.non_field_errors %}
+            <div class="error-text" style="margin-bottom:12px; display:block;">
+              {{ form.non_field_errors.as_text|linebreaksbr }}
+            </div>
+          {% endif %}
+          {% if not create %}
+            <div class="success-banner"> <strong>Username:</strong> {{ user_obj.username }} <small class="muted-note">(no se puede modificar)</small></div>
+          {% endif %}
+
+          <div class="form-grid">
+            <div>
+              <div class="field-row">
+                <div class="field-label">Email *</div>
+                <div class="field-control">{{ form.email }}{% if form.email.errors %}<div class="error-text">{{ form.email.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-label">Nombre</div>
+                <div class="field-control">{{ form.first_name }}{% if form.first_name.errors %}<div class="error-text">{{ form.first_name.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+
+              <div class="field-row two">
+                <div class="field-label">Tipo de Documento</div>
+                <div class="field-control">{{ form.tipo_documento }}{% if form.tipo_documento.errors %}<div class="error-text">{{ form.tipo_documento.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+                <div class="field-label">Fecha de Nacimiento</div>
+                <div class="field-control">{{ form.fecha_nacimiento }}{% if form.fecha_nacimiento.errors %}<div class="error-text">{{ form.fecha_nacimiento.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+
+              <!-- mover la contraseña debajo de Tipo de Documento / Fecha -->
+              <div class="field-row single mt-6">
+                <div class="field-label">Nueva Contraseña</div>
+                <div class="field-control pwd-wrapper">
+                  {{ form.password }}
+                  <button type="button" class="pwd-toggle" data-target="id_password" aria-label="Mostrar contraseña">
+                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle class="eye-pupil" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/>
+                      <line class="eye-slash" x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  {% if form.password.errors %}
+                    <div class="error-text">{{ form.password.errors.as_text|linebreaksbr }}</div>
+                  {% endif %}
+                  <div class="muted-note">Ingresa una nueva contraseña si deseas cambiarla. Dejar vacío para no cambiar.</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="field-row">
+                <div class="field-label">Rol *</div>
+                <div class="field-control">{{ form.role }}{% if form.role.errors %}<div class="error-text">{{ form.role.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-label">Apellido</div>
+                <div class="field-control">{{ form.last_name }}{% if form.last_name.errors %}<div class="error-text">{{ form.last_name.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+
+              <div class="field-row single">
+                <div class="field-label">Número de Documento</div>
+                <div class="field-control">{{ form.numero_documento }}{% if form.numero_documento.errors %}<div class="error-text">{{ form.numero_documento.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+              <div class="field-row single">
+                <div class="field-label">Racha (días)</div>
+                <div class="field-control">{{ form.racha }}{% if form.racha.errors %}<div class="error-text">{{ form.racha.errors.as_text|linebreaksbr }}</div>{% endif %}</div>
+              </div>
+            </div>
+          </div>
+          <div class="rules-container">
+            <ul id="pwd-rules" class="pwd-rules">
+              <li data-rule="length">✕ 8-20 caracteres</li>
+              <li data-rule="upper">✕ Una letra mayúscula</li>
+              <li data-rule="lower">✓ Una letra minúscula</li>
+              <li data-rule="digit">✕ Un número</li>
+              <li data-rule="symbol">✕ Un símbolo (@$!%*?&)</li>
+            </ul>
+          </div>
+
+          <!-- Banderas de administración removidas: usar selector de rol y el control de activo en la lista de usuarios -->
+
+          <div class="form-actions">
+            <a href="{% url 'core:users' %}" class="btn btn-cancel">Cancelar</a>
+            <button class="btn btn-primary btn-save" type="submit">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+  <script src="{% static 'js/admin_user_form.js' %}"></script>
+</body>
+</html>

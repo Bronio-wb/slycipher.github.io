@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generador de Reportes - SLYCIPHER</title>
+  <link rel="stylesheet" href="{% static 'css/admin_reports.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="#">Lecciones</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}" class="active">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <div class="header-row">
+        <div>
+          <h1>Generador de Reportes</h1>
+          <p>Crea reportes personalizados con filtros multicriterio</p>
+        </div>
+        <div class="date-now">📅 <span id="fecha-actual"></span></div>
+      </div>
+
+      <div class="report-cards">
+        <button class="report-card blue" type="button" data-tipo="usuarios">
+          <div class="icon-wrap">👥</div>
+          <h3>Reporte de Usuarios</h3>
+          <p>Análisis completo de usuarios</p>
+        </button>
+        <button class="report-card green" type="button" data-tipo="cursos">
+          <div class="icon-wrap">📚</div>
+          <h3>Reporte de Cursos</h3>
+          <p>Estadísticas de cursos</p>
+        </button>
+        <button class="report-card purple" type="button" data-tipo="progreso">
+          <div class="icon-wrap">📊</div>
+          <h3>Reporte de Progreso</h3>
+          <p>Análisis de progreso</p>
+        </button>
+        <button class="report-card orange" type="button" data-tipo="general">
+          <div class="icon-wrap">📈</div>
+          <h3>Reporte General</h3>
+          <p>Resumen ejecutivo</p>
+        </button>
+      </div>
+
+      <section id="generator-form" class="generator-form hidden">
+        <div class="form-title"><span>🔽</span><h2>Generador de Reportes Personalizado</h2></div>
+
+        <form id="report-form" action="{% url 'core:admin_reports_result' %}" method="get">
+          <div class="field-block">
+            <label>📄 Tipo de Reporte</label>
+            <div class="radio-grid">
+              <label class="radio-item"><input type="radio" name="tipoReporte" value="usuarios" required><span>👥 Usuarios</span></label>
+              <label class="radio-item"><input type="radio" name="tipoReporte" value="cursos" required><span>📚 Cursos</span></label>
+              <label class="radio-item"><input type="radio" name="tipoReporte" value="progreso" required><span>📊 Progreso</span></label>
+              <label class="radio-item"><input type="radio" name="tipoReporte" value="general" required><span>📈 General</span></label>
+            </div>
+          </div>
+
+          <div class="date-grid">
+            <div>
+              <label>📅 Fecha Desde</label>
+              <input type="date" id="fechaDesde" name="fechaDesde">
+            </div>
+            <div>
+              <label>📅 Fecha Hasta</label>
+              <input type="date" id="fechaHasta" name="fechaHasta">
+            </div>
+          </div>
+
+          <div class="optional-grid">
+            <div>
+              <label>Rol (usuarios)</label>
+              <select name="rol">
+                <option value="">Todos</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="DEVELOPER">DEVELOPER</option>
+                <option value="STUDENT">STUDENT</option>
+              </select>
+            </div>
+            <div>
+              <label>Estado usuario</label>
+              <select name="activo">
+                <option value="">Todos</option>
+                <option value="true">Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </div>
+            <div>
+              <label>Nivel (cursos)</label>
+              <select name="nivel">
+                <option value="">Todos</option>
+                <option value="principiante">Principiante</option>
+                <option value="intermedio">Intermedio</option>
+                <option value="avanzado">Avanzado</option>
+              </select>
+            </div>
+            <div>
+              <label>Lenguaje ID (cursos)</label>
+              <input type="text" name="lenguajeId" placeholder="Ej: 1">
+            </div>
+          </div>
+
+          <div class="download-format">
+            <label>📥 Formato</label>
+            <div class="format-row">
+              <label class="format-item"><input type="radio" name="formato" value="pdf" required><span>📄 PDF</span></label>
+              <label class="format-item"><input type="radio" name="formato" value="excel" required><span>📊 Excel</span></label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit">⬇️ Generar Reporte</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="{% static 'js/admin_reports.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+from django.urls import path
+
+from . import views
+
+
+urlpatterns = [
+	path('panel/courses/', views.admin_courses, name='admin_courses'),
+	path('panel/courses/create/', views.admin_course_create, name='admin_course_create'),
+	path('panel/courses/<int:legacy_id>/view/', views.admin_course_detail_view, name='admin_course_detail_view'),
+	path('panel/courses/<int:legacy_id>/edit/', views.admin_course_edit, name='admin_course_edit'),
+	path('panel/courses/<int:legacy_id>/delete/', views.admin_course_delete, name='admin_course_delete'),
+	path('panel/courses/<int:legacy_id>/approve/', views.admin_course_approve, name='admin_course_approve'),
+	path('panel/courses/<int:legacy_id>/reject/', views.admin_course_reject, name='admin_course_reject'),
+	path('panel/courses/<int:pk>/toggle_visibility/', views.course_toggle_visibility, name='course_toggle_visibility'),
+	path('panel/courses/legacy/<int:legacy_id>/toggle_visibility/', views.legacy_course_toggle_visibility, name='legacy_course_toggle_visibility'),
+	path('courses/', views.course_list, name='course_list'),
+	path('course/create/', views.course_create, name='course_create'),
+	path('course/<int:pk>/', views.course_detail, name='course_detail'),
+	path('course/<int:pk>/edit/', views.course_update, name='course_update'),
+	path('course/<int:pk>/delete/', views.course_delete, name='course_delete'),
+	path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+	path('student/courses/', views.student_courses, name='student_courses'),
+	path('student/courses/<int:course_id>/', views.student_course_detail, name='student_course_detail'),
+	path('student/courses/<int:course_id>/enroll/', views.student_course_enroll, name='student_course_enroll'),
+	path('student/lessons/<int:lesson_id>/', views.student_lesson_detail, name='student_lesson_detail'),
+	path('student/lessons/<int:lesson_id>/complete/', views.student_lesson_complete, name='student_lesson_complete'),
+	path('student/progreso/', views.student_progress, name='student_progress'),
+	path('student/progress/', views.student_progress),
+	path('developer/dashboard/', views.developer_dashboard, name='developer_dashboard'),
+	path('developer/courses/', views.developer_courses, name='developer_courses'),
+	path('developer/courses/create/', views.developer_course_create, name='developer_course_create'),
+	path('developer/courses/<int:course_id>/view/', views.developer_course_view, name='developer_course_view'),
+	path('developer/courses/<int:course_id>/lessons/', views.developer_course_lessons, name='developer_course_lessons'),
+	path('developer/courses/<int:course_id>/lessons/create/', views.developer_lesson_create, name='developer_lesson_create'),
+	path('developer/courses/<int:course_id>/lessons/execute/', views.developer_lesson_code_execute, name='developer_lesson_code_execute'),
+	path('developer/courses/<int:course_id>/edit/', views.dev_course_edit, name='dev_course_edit'),
+	path('developer/courses/<int:course_id>/delete/', views.dev_course_delete, name='dev_course_delete'),
+	path('developer/lessons/<int:lesson_id>/edit/', views.developer_lesson_edit, name='developer_lesson_edit'),
+	path('developer/lessons/<int:lesson_id>/delete/', views.developer_lesson_delete, name='developer_lesson_delete'),
+	path('developer/statistics/', views.developer_statistics, name='developer_statistics'),
+	path('developer/my_courses_students/', views.developer_my_courses_students, name='developer_my_courses_students'),
+	path('developer/courses/<int:course_id>/students/', views.developer_course_students_detail, name='developer_course_students_detail'),
+]

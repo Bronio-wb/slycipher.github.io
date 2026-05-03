@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explorar Cursos | Slycipher</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    .sidebar {
+      min-height: calc(100vh - 56px);
+      background: white;
+      border-right: 1px solid #e0e0e0;
+    }
+    .sidebar .nav-link {
+      color: #6c757d;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 4px 8px;
+      transition: all 0.25s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #ffe5d9;
+      color: #ff6b35;
+    }
+    .sidebar .nav-link.active {
+      background-color: #ffe5d9;
+      color: #ff6b35;
+      font-weight: 600;
+    }
+    .sidebar .nav-link i {
+      margin-right: 8px;
+    }
+    .filter-card {
+      border-radius: 14px;
+    }
+    .filter-input,
+    .filter-select {
+      border-radius: 10px;
+      border: 1px solid #dcdfe3;
+      min-height: 44px;
+      box-shadow: none !important;
+    }
+    .filter-input:focus,
+    .filter-select:focus {
+      border-color: #ff6b35;
+      box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.15) !important;
+    }
+    .course-card {
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .course-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+    }
+    .course-banner {
+      background: linear-gradient(135deg, #2c3a51 0%, #1a2332 100%);
+      text-align: center;
+      padding: 1.1rem;
+    }
+    .course-logo {
+      width: 92px;
+      height: 92px;
+      object-fit: contain;
+    }
+    .course-desc {
+      color: #6c757d;
+      min-height: 54px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .soft-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+    .soft-icon.blue { background: rgba(13,110,253,0.12); color: #0d6efd; }
+    .soft-icon.green { background: rgba(25,135,84,0.12); color: #198754; }
+    .soft-icon.cyan { background: rgba(13,202,240,0.16); color: #0dcaf0; }
+    .state-badge {
+      text-transform: capitalize;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #ff6b35;">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Slycipher" style="width:30px;height:30px;margin-right:10px;object-fit:contain;">
+        SLYCIPHER Student
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><span class="nav-link">Hola, <strong>{{ user.username }}</strong></span></li>
+          <li class="nav-item"><span class="nav-link">🔥 Racha: <strong>{{ racha|default:0 }}</strong> días</span></li>
+          <li class="nav-item"><a href="/logout/" class="btn btn-danger btn-sm ms-2 mt-1">Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-md-block sidebar p-0">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:student_dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'core:student_courses' %}">
+                <i class="bi bi-book"></i> Cursos
+              </a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_challenges' %}"><i class="bi bi-trophy"></i> Desafíos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_progress' %}"><i class="bi bi-graph-up"></i> Mi Progreso</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_achievements' %}"><i class="bi bi-award"></i> Logros</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:profile' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:student_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Cursos</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+          <div>
+            <h1 class="h2 mb-1"><i class="bi bi-mortarboard-fill text-primary"></i> Explorar Cursos</h1>
+            <p class="text-muted mb-0">Descubre y aprende con nuestros cursos disponibles</p>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4 filter-card">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-funnel"></i> Filtros de Búsqueda</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="buscarCurso" class="form-label">Buscar por título, descripción o instructor</label>
+                <input type="text" class="form-control filter-input" id="buscarCurso" placeholder="Escribe para buscar...">
+              </div>
+              <div class="col-md-2">
+                <label for="filtroCategoria" class="form-label">Categoría</label>
+                <select class="form-select filter-select" id="filtroCategoria">
+                  <option value="">Todas</option>
+                  {% for categoria in categorias %}
+                    <option value="{{ categoria|lower }}">{{ categoria }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label for="filtroNivel" class="form-label">Nivel</label>
+                <select class="form-select filter-select" id="filtroNivel">
+                  <option value="">Todos</option>
+                  {% for nivel in niveles %}
+                    <option value="{{ nivel|lower }}">{{ nivel }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label for="filtroLenguaje" class="form-label">Lenguaje</label>
+                <select class="form-select filter-select" id="filtroLenguaje">
+                  <option value="">Todos</option>
+                  {% for lenguaje in lenguajes %}
+                    <option value="{{ lenguaje|lower }}">{{ lenguaje }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-1">
+                <label for="filtroEstado" class="form-label">Estado</label>
+                <select class="form-select filter-select" id="filtroEstado">
+                  <option value="">Todos</option>
+                  {% for estado in estados %}
+                    <option value="{{ estado|lower }}">{{ estado }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-outline-secondary w-100" id="limpiarFiltros" title="Limpiar filtros">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              </div>
+            </div>
+            <div class="mt-3">
+              <small class="text-muted">
+                <i class="bi bi-info-circle"></i>
+                Mostrando <strong id="resultadosCount">{{ cursos_filtrados|default:0 }}</strong> de <strong id="totalCount">{{ cursos_total|default:0 }}</strong> cursos
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4" id="coursesGrid">
+          {% for curso in cursos %}
+          <div class="col-lg-4 col-md-6 course-col"
+               data-titulo="{{ curso.titulo|default:''|lower }}"
+               data-descripcion="{{ curso.descripcion|default:''|lower }}"
+               data-instructor="{{ curso.instructor|default:''|lower }}"
+               data-categoria="{{ curso.categoria|default:''|lower }}"
+               data-nivel="{{ curso.nivel|default:''|lower }}"
+               data-lenguaje="{{ curso.lenguaje|default:''|lower }}"
+               data-estado="{{ curso.estado|default:''|lower }}">
+            <div class="card h-100 border-0 shadow-sm course-card">
+              <a href="{% url 'core:student_course_detail' curso.id %}" class="course-banner text-decoration-none">
+                <img src="{% static 'images/logo_desafios.png' %}" alt="Curso" class="course-logo">
+              </a>
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="text-center fw-bold mb-1">{{ curso.titulo }}</h5>
+                <p class="text-center mb-3">
+                  {% with nivel=curso.nivel|lower %}
+                    {% if 'princip' in nivel %}
+                      <span class="badge" style="background-color:#22c55e;">{{ curso.nivel|default:'Principiante' }}</span>
+                    {% elif 'inter' in nivel %}
+                      <span class="badge bg-warning text-dark">{{ curso.nivel|default:'Intermedio' }}</span>
+                    {% else %}
+                      <span class="badge bg-danger">{{ curso.nivel|default:'Avanzado' }}</span>
+                    {% endif %}
+                  {% endwith %}
+                  <span class="badge bg-secondary state-badge ms-1">{{ curso.estado|default:'Aprobado' }}</span>
+                </p>
+                <p class="course-desc mb-3">{{ curso.descripcion|default:'Sin descripción' }}</p>
+
+                <div class="border-top pt-3 mt-auto">
+                  <div class="d-flex align-items-center mb-2">
+                    <span class="soft-icon blue"><i class="bi bi-code-slash"></i></span>
+                    <div>
+                      <small class="text-muted d-block">Lenguaje</small>
+                      <strong class="small">{{ curso.lenguaje|default:'N/A' }}</strong>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center mb-2">
+                    <span class="soft-icon green"><i class="bi bi-tag"></i></span>
+                    <div>
+                      <small class="text-muted d-block">Categoría</small>
+                      <strong class="small">{{ curso.categoria|default:'Sin categoría' }}</strong>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="soft-icon cyan"><i class="bi bi-person"></i></span>
+                    <div>
+                      <small class="text-muted d-block">Instructor</small>
+                      <strong class="small">{{ curso.instructor|default:'developer' }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer bg-white border-0 pt-0 pb-3">
+                <div class="d-grid">
+                  <a href="{% url 'core:student_course_detail' curso.id %}" class="btn" style="background-color:#2c3a51;color:#fff;">
+                    <i class="bi bi-eye"></i> Ver Detalles del Curso
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-5">
+            <div class="mb-4"><i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i></div>
+            <h4 class="text-muted mb-3">No hay cursos disponibles</h4>
+            <p class="text-muted">Los cursos aprobados aparecerán aquí próximamente</p>
+            <a href="{% url 'core:student_dashboard' %}" class="btn btn-primary mt-3">
+              <i class="bi bi-arrow-left"></i> Volver al Dashboard
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="bg-white border-top mt-5 py-3">
+    <div class="container text-center">
+      <span class="text-muted">© 2024 Slycipher - Plataforma de Aprendizaje</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const searchInput = document.getElementById('buscarCurso');
+    const categorySelect = document.getElementById('filtroCategoria');
+    const levelSelect = document.getElementById('filtroNivel');
+    const languageSelect = document.getElementById('filtroLenguaje');
+    const stateSelect = document.getElementById('filtroEstado');
+    const clearBtn = document.getElementById('limpiarFiltros');
+    const resultCount = document.getElementById('resultadosCount');
+    const totalCount = document.getElementById('totalCount');
+
+    function filtrarCursos() {
+      const term = (searchInput.value || '').toLowerCase().trim();
+      const categoria = (categorySelect.value || '').toLowerCase().trim();
+      const nivel = (levelSelect.value || '').toLowerCase().trim();
+      const lenguaje = (languageSelect.value || '').toLowerCase().trim();
+      const estado = (stateSelect.value || '').toLowerCase().trim();
+
+      const cards = document.querySelectorAll('.course-col');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const titulo = card.dataset.titulo || '';
+        const descripcion = card.dataset.descripcion || '';
+        const instructor = card.dataset.instructor || '';
+        const cardCategoria = card.dataset.categoria || '';
+        const cardNivel = card.dataset.nivel || '';
+        const cardLenguaje = card.dataset.lenguaje || '';
+        const cardEstado = card.dataset.estado || '';
+
+        const matchSearch = !term || titulo.includes(term) || descripcion.includes(term) || instructor.includes(term);
+        const matchCategoria = !categoria || cardCategoria === categoria;
+        const matchNivel = !nivel || cardNivel === nivel;
+        const matchLenguaje = !lenguaje || cardLenguaje === lenguaje;
+        const matchEstado = !estado || cardEstado === estado;
+
+        const show = matchSearch && matchCategoria && matchNivel && matchLenguaje && matchEstado;
+        card.style.display = show ? '' : 'none';
+        if (show) visible += 1;
+      });
+
+      resultCount.textContent = String(visible);
+      totalCount.textContent = String(document.querySelectorAll('.course-col').length);
+    }
+
+    [searchInput, categorySelect, levelSelect, languageSelect, stateSelect].forEach(el => {
+      if (!el) return;
+      el.addEventListener('input', filtrarCursos);
+      el.addEventListener('change', filtrarCursos);
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        searchInput.value = '';
+        categorySelect.value = '';
+        levelSelect.value = '';
+        languageSelect.value = '';
+        stateSelect.value = '';
+        filtrarCursos();
+      });
+    }
+
+    filtrarCursos();
+  </script>
+</body>
+</html>

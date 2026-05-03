@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Curso - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f5f5f5; }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .stat-card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+    .stat-card h3 { font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .stat-card p { color: #6b7280; font-size: .875rem; margin: 0; }
+    .stat-card i { font-size: 1.15rem; margin-right: 6px; }
+    .stat-card-blue i { color: #2563eb; }
+    .stat-card-green i { color: #10b981; }
+    .stat-card-yellow i { color: #f59e0b; }
+    .stat-card-cyan i { color: #06b6d4; }
+    .info-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .lesson-item { border-left: 4px solid #2563eb; padding: 12px; margin-bottom: 12px; background: #f8f9fa; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge bg-success bg-opacity-75">Ver Curso</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}" class="active"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>{{ curso.titulo }}</h2>
+          <p class="text-muted mb-0">Detalles completos del curso</p>
+        </div>
+        <div>
+          <a href="{% url 'core:dev_course_edit' curso.id %}" class="btn btn-primary me-2"><i class="bi bi-pencil"></i> Editar Curso</a>
+          <a href="{% url 'core:developer_courses' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stat-card stat-card-blue">
+            <h3>{{ total_lecciones }}</h3>
+            <p><i class="bi bi-journal-text"></i> Lecciones Totales</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card stat-card-green">
+            <h3>{{ lecciones_activas }}</h3>
+            <p><i class="bi bi-check-circle"></i> Lecciones Activas</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card stat-card-yellow">
+            <h3>{{ curso.duracion }}</h3>
+            <p><i class="bi bi-clock"></i> Duración Total</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card stat-card-cyan">
+            {% if curso.visible %}
+              <h3>Visible</h3>
+            {% else %}
+              <h3>Oculto</h3>
+            {% endif %}
+            <p><i class="bi bi-eye"></i> Visibilidad</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="info-card">
+            <h4 class="mb-3"><i class="bi bi-info-circle"></i> Información Básica</h4>
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted fw-bold" style="width: 40%;">Título:</td>
+                <td>{{ curso.titulo }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Estado:</td>
+                <td>
+                  {% with estado_text=curso.estado|lower %}
+                    {% if 'aprob' in estado_text or 'active' in estado_text or 'activo' in estado_text %}
+                      <span class="badge bg-success"><i class="bi bi-check-circle"></i> Activo</span>
+                    {% elif 'pend' in estado_text %}
+                      <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> Pendiente</span>
+                    {% elif 'rechaz' in estado_text or 'inactiv' in estado_text %}
+                      <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inactivo</span>
+                    {% else %}
+                      <span class="badge bg-success"><i class="bi bi-check-circle"></i> Activo</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Categoría:</td>
+                <td>{{ curso.categoria }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Lenguaje:</td>
+                <td>{{ curso.lenguaje }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Nivel:</td>
+                <td><span class="badge bg-primary text-capitalize">{{ curso.nivel }}</span></td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="info-card">
+            <h4 class="mb-3"><i class="bi bi-file-text"></i> Descripción</h4>
+            <p class="text-muted">{{ curso.descripcion|default:'Sin descripción' }}</p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="info-card">
+            <h4 class="mb-3"><i class="bi bi-gear"></i> Detalles</h4>
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted fw-bold" style="width: 40%;">Duración:</td>
+                <td>{{ curso.duracion }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Fecha Creación:</td>
+                <td>
+                  {% if curso.fecha_creacion %}
+                    {{ curso.fecha_creacion|date:'d/m/Y H:i' }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">ID Curso:</td>
+                <td><code>{{ curso.id }}</code></td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Categoría ID:</td>
+                <td><code>{{ curso.categoria_id }}</code></td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-bold">Lenguaje ID:</td>
+                <td><code>{{ curso.lenguaje_id }}</code></td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="info-card">
+            <h4 class="mb-3"><i class="bi bi-list-check"></i> Requisitos</h4>
+            <p class="text-muted">{{ curso.requisitos|default:'Sin requisitos' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="lessons" class="info-card mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0"><i class="bi bi-journal-text"></i> Lecciones del Curso</h4>
+          <div>
+            <a href="{% url 'core:developer_course_lessons' curso.id %}" class="btn btn-primary me-2"><i class="bi bi-list-ul"></i> Gestionar Lecciones</a>
+            <a href="{% url 'core:developer_lesson_create' curso.id %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Agregar Lección</a>
+          </div>
+        </div>
+
+        {% if lecciones %}
+          {% for leccion in lecciones %}
+          <div class="lesson-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">
+                  <span class="badge bg-primary rounded-circle" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">{{ leccion.orden }}</span>
+                  <span>{{ leccion.titulo }}</span>
+                </h6>
+                <p class="text-muted mb-0 small">{{ leccion.contenido_resumen }}</p>
+              </div>
+              <div class="d-flex gap-2 align-items-center">
+                {% with lesson_status=leccion.estado|lower %}
+                  {% if 'aprob' in lesson_status %}
+                    <span class="badge bg-success">Aprobada</span>
+                  {% elif 'rechaz' in lesson_status %}
+                    <span class="badge bg-danger">Rechazada</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Pendiente</span>
+                  {% endif %}
+                {% endwith %}
+                {% if leccion.visible %}
+                  <span class="badge bg-info">Visible</span>
+                {% else %}
+                  <span class="badge bg-secondary">Oculta</span>
+                {% endif %}
+                <a href="{% url 'core:developer_lesson_edit' leccion.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+                <form action="{% url 'core:developer_lesson_delete' leccion.id %}" method="post" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar la lección «{{ leccion.titulo }}»? Esta acción no se puede deshacer.');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div style="font-size: 3rem;">📝</div>
+            <p class="text-muted">No hay lecciones creadas para este curso</p>
+            <a href="{% url 'core:developer_lesson_create' curso.id %}" class="btn btn-success mt-2"><i class="bi bi-plus-circle"></i> Crear Primera Lección</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

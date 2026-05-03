@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestión de Cursos - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_users.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}?v=20260323-4">
+  <style>
+    .flash-message {
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+    }
+    .flash-message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .flash-message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}" class="active">Cursos</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+    </aside>
+
+    <main class="content">
+      <div class="card">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="flash-message {% if message.level_tag == 'success' %}success{% else %}error{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <a href="{% url 'core:admin_course_create' %}" class="btn btn-primary">Nuevo Curso</a>
+            <input id="search" name="q" value="{{ query|default:'' }}" placeholder="Escribe para buscar..." class="search-input">
+          </div>
+          <div class="toolbar-right">
+            <label>Categoría</label>
+            <select id="categoryFilter" name="category" class="select-filter">
+              <option value="">Todas</option>
+              {% for cat in categories %}
+                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+            <label>Nivel</label>
+            <select id="levelFilter" name="level" class="select-filter">
+              <option value="">Todos</option>
+              {% for lv in levels %}
+                <option value="{{ lv }}" {% if selected_level == lv %}selected{% endif %}>{{ lv }}</option>
+              {% endfor %}
+            </select>
+            <label>Estado</label>
+            <select id="statusFilter" name="status" class="select-filter">
+              <option value="">Todos</option>
+              {% for st in statuses %}
+                <option value="{{ st }}" {% if selected_status == st %}selected{% endif %}>{{ st }}</option>
+              {% endfor %}
+            </select>
+            <label>Visibilidad</label>
+            <select id="visibilityFilter" name="visibility" class="select-filter">
+              <option value="">Todos</option>
+              {% for v in visibilities %}
+                <option value="{{ v }}" {% if selected_visibility == v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <table class="table courses-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Categoría</th>
+              <th>Nivel</th>
+              <th>Estado Aprobación</th>
+              <th>Visibilidad</th>
+              <th>Creador</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% if legacy_courses %}
+                {% for c in legacy_courses %}
+                <tr>
+                  <td>{{ c.legacy_id|default:'-' }}</td>
+                  <td>{{ c.title }}</td>
+                  <td>{{ c.category|default:'-' }}</td>
+                  <td>{{ c.level|default:'-' }}</td>
+                  <td>
+                    {% if c.status %}
+                      <span class="badge">{{ c.status }}</span>
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if c.visibility == 1 or c.visibility == '1' or c.visibility == True or c.visibility == 'true' or c.visibility == 'True' or c.visibility == 'visible' or c.visibility == 'Visible' or c.visibility == 'visibe' %}
+                      {% if c.legacy_id and c.legacy_id != '-' %}
+                        <button type="button" class="visibility-pill visibility-toggle visible" data-url="{% url 'core:legacy_course_toggle_visibility' c.legacy_id %}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          <span class="visibility-label">Visible</span>
+                        </button>
+                      {% else %}
+                        <span class="visibility-pill visible">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          <span class="visibility-label">Visible</span>
+                        </span>
+                      {% endif %}
+                    {% else %}
+                      {% if c.legacy_id and c.legacy_id != '-' %}
+                        <button type="button" class="visibility-pill visibility-toggle hidden" data-url="{% url 'core:legacy_course_toggle_visibility' c.legacy_id %}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.7a3 3 0 0 0 4.2 4.2"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 10 7 10 7a16.6 16.6 0 0 1-3.1 3.9"></path><path d="M6.6 6.7A17.3 17.3 0 0 0 2 12s4 7 10 7a10.7 10.7 0 0 0 4.1-.8"></path></svg>
+                          <span class="visibility-label">Oculto</span>
+                        </button>
+                      {% else %}
+                        <span class="visibility-pill hidden">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.7a3 3 0 0 0 4.2 4.2"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 10 7 10 7a16.6 16.6 0 0 1-3.1 3.9"></path><path d="M6.6 6.7A17.3 17.3 0 0 0 2 12s4 7 10 7a10.7 10.7 0 0 0 4.1-.8"></path></svg>
+                          <span class="visibility-label">Oculto</span>
+                        </span>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                  <td>{{ c.creator|default:'-' }}</td>
+                  <td class="action-buttons">
+                    <div class="action-stack">
+                      {% with st=c.status|default:''|lower %}
+                        {% if st == 'pendiente' or st == 'pending' or st == 'en revisión' or st == 'en revision' %}
+                          <div class="action-top-row">
+                            <form method="post" action="{% url 'core:admin_course_approve' c.legacy_id %}" class="inline-form inline-form-half">
+                              {% csrf_token %}
+                              <button type="submit" class="icon-btn approve" title="Aprobar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                  <path d="M12 2a10 10 0 110 20 10 10 0 010-20z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                                  <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Aprobar</span>
+                              </button>
+                            </form>
+                            <form method="post" action="{% url 'core:admin_course_reject' c.legacy_id %}" class="inline-form inline-form-half">
+                              {% csrf_token %}
+                              <button type="submit" class="icon-btn reject" title="Rechazar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                  <path d="M12 2a10 10 0 110 20 10 10 0 010-20z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Rechazar</span>
+                              </button>
+                            </form>
+                          </div>
+                        {% endif %}
+                      {% endwith %}
+                      <a href="{% url 'core:admin_course_detail_view' c.legacy_id %}" class="icon-btn view" title="Ver">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                        </svg>
+                        <span>Ver</span>
+                      </a>
+                      <a href="{% url 'core:admin_course_edit' c.legacy_id %}" class="icon-btn edit" title="Editar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M3 21v-3.75L14.06 6.19l3.75 3.75L6.75 21H3z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                          <path d="M18.37 6.62l-1 1 1-1z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                        </svg>
+                        <span>Editar</span>
+                      </a>
+                      <a href="{% url 'core:admin_course_delete' c.legacy_id %}" class="icon-btn delete" title="Eliminar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M3 6h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          <path d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                        <span>Eliminar</span>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                {% for c in courses %}
+                <tr>
+                  <td>{% if c.legacy_id %}{{ c.legacy_id }}{% else %}{{ c.id }}{% endif %}</td>
+                  <td>{{ c.title }}</td>
+                  <td>{{ c.category|default:'-' }}</td>
+                  <td>{{ c.level|default:'-' }}</td>
+                  <td>
+                    {% if c.status %}
+                      <span class="badge badge-{{ c.status|lower }}">{{ c.status }}</span>
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if c.visibility == 1 or c.visibility == '1' or c.visibility == True or c.visibility == 'true' or c.visibility == 'True' or c.visibility == 'visible' or c.visibility == 'Visible' or c.visibility == 'visibe' %}
+                      <button type="button" class="visibility-pill visibility-toggle visible" data-url="{% url 'core:course_toggle_visibility' c.pk %}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <span class="visibility-label">Visible</span>
+                      </button>
+                    {% else %}
+                      <button type="button" class="visibility-pill visibility-toggle hidden" data-url="{% url 'core:course_toggle_visibility' c.pk %}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.7a3 3 0 0 0 4.2 4.2"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 10 7 10 7a16.6 16.6 0 0 1-3.1 3.9"></path><path d="M6.6 6.7A17.3 17.3 0 0 0 2 12s4 7 10 7a10.7 10.7 0 0 0 4.1-.8"></path></svg>
+                        <span class="visibility-label">Oculto</span>
+                      </button>
+                    {% endif %}
+                  </td>
+                  <td>{% if c.creator %}{{ c.creator.username|default:c.creator }}{% else %}-{% endif %}</td>
+                  <td class="action-buttons">
+                    <div class="action-stack">
+                      {% with st=c.status|default:''|lower %}
+                        {% if st == 'pendiente' or st == 'pending' or st == 'en revisión' or st == 'en revision' %}
+                          <div class="action-top-row">
+                            <a href="#" class="icon-btn approve" title="Aprobar">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M12 2a10 10 0 110 20 10 10 0 010-20z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                                <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              <span>Aprobar</span>
+                            </a>
+                            <a href="#" class="icon-btn reject" title="Rechazar">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M12 2a10 10 0 110 20 10 10 0 010-20z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              <span>Rechazar</span>
+                            </a>
+                          </div>
+                        {% endif %}
+                      {% endwith %}
+                      <a href="{% url 'core:course_detail' c.pk %}" class="icon-btn view" title="Ver">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                        </svg>
+                        <span>Ver</span>
+                      </a>
+                      <a href="{% url 'core:course_update' c.pk %}" class="icon-btn edit" title="Editar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                          <path d="M3 21v-3.75L14.06 6.19l3.75 3.75L6.75 21H3z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                          <path d="M18.37 6.62l-1 1 1-1z" stroke="currentColor" stroke-width="1.4" fill="none"/>
+                        </svg>
+                        <span>Editar</span>
+                      </a>
+                      <form method="post" action="{% url 'core:course_delete' c.pk %}" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn delete" title="Eliminar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                          </svg>
+                          <span>Eliminar</span>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8">No hay cursos.</td></tr>
+                {% endfor %}
+              {% endif %}
+          </tbody>
+        </table>
+
+        <div class="stat-row">
+          <div class="stat-card"><strong>Total Cursos</strong><div class="stat-value">{{ total_courses }}</div></div>
+          <div class="stat-card"><strong>Pendientes</strong><div class="stat-value">{{ pending }}</div></div>
+          <div class="stat-card"><strong>Aprobados</strong><div class="stat-value">{{ approved }}</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="{% static 'js/admin_courses.js' %}"></script>
+
+</body>
+</html>

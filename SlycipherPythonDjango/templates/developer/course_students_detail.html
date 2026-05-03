@@ -1,0 +1,512 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudiantes del Curso</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #263847;
+      --accent-color: #ff6b35;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --info-color: #06b6d4;
+    }
+
+    body {
+      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .navbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .navbar a {
+      color: white !important;
+    }
+
+    .sidebar {
+      background-color: white;
+      border-right: 1px solid #e5e7eb;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 0.75rem 1.5rem;
+      color: #4b5563;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar nav a:hover {
+      color: var(--primary-color);
+      background-color: #f0f4f8;
+      border-left-color: var(--accent-color);
+    }
+
+    .sidebar nav a.active {
+      color: var(--accent-color);
+      background-color: #fff7ed;
+      border-left-color: var(--accent-color);
+    }
+
+    .main-content {
+      padding: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .course-info {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-info h2 {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .course-meta-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .meta-label {
+      color: #9ca3af;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .meta-value {
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .student-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+
+    .student-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .student-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .student-info h3 {
+      color: var(--primary-color);
+      margin: 0 0 0.25rem 0;
+      font-weight: 700;
+    }
+
+    .student-info p {
+      color: #6b7280;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar-container {
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      height: 24px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success-color), #06b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: width 0.3s ease;
+    }
+
+    .progress-bar-fill-challenges {
+      background: linear-gradient(90deg, var(--info-color), #3b82f6);
+    }
+
+    .challenges-list {
+      margin-top: 1rem;
+    }
+
+    .challenge-item {
+      background-color: #f9fafb;
+      border-left: 3px solid #e5e7eb;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .challenge-item.correcto {
+      border-left-color: var(--success-color);
+      background-color: #f0fdf4;
+    }
+
+    .challenge-item.incorrecto {
+      border-left-color: var(--danger-color);
+      background-color: #fef2f2;
+    }
+
+    .challenge-item.pendiente {
+      border-left-color: var(--warning-color);
+      background-color: #fffbeb;
+    }
+
+    .challenge-title {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .challenge-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+      flex-wrap: wrap;
+    }
+
+    .badge-custom {
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge-success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-danger {
+      background-color: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .badge-warning {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .back-button {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-button:hover {
+      color: var(--accent-color);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'core:admin_dashboard' %}">SLYCIPHER</a>
+      <div class="collapse navbar-collapse">
+        <span class="navbar-text ms-auto">{{ request.user.username }} (Desarrollador)</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="width: 250px;">
+      <nav>
+        <a href="{% url 'core:developer_dashboard' %}">Dashboard</a>
+        <a href="{% url 'core:developer_courses' %}">Mis Cursos</a>
+        <a href="{% url 'core:developer_my_courses_students' %}" class="active">Estudiantes</a>
+        <a href="{% url 'core:developer_statistics' %}">Estadísticas</a>
+        <a href="{% url 'core:logout' %}">Cerrar Sesión</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" style="flex: 1;">
+      <a href="{% url 'core:developer_my_courses_students' %}" class="back-button">← Volver a Mis Cursos</a>
+
+      <div class="page-header">
+        <h1>Estudiantes del Curso</h1>
+        <p>Visualiza el progreso y desafíos completados por tus estudiantes</p>
+      </div>
+
+      <!-- Course Info -->
+      <div class="course-info">
+        <h2>{{ curso_titulo }}</h2>
+        {% if curso_descripcion %}
+          <p style="color: #6b7280; margin: 0.5rem 0 0 0;">{{ curso_descripcion }}</p>
+        {% endif %}
+        <div class="course-meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Nivel:</span>
+            <span class="meta-value">{{ curso_nivel }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Categoría:</span>
+            <span class="meta-value">{{ curso_categoria }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Lenguaje:</span>
+            <span class="meta-value">{{ curso_lenguaje }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Desafíos:</span>
+            <span class="meta-value">{{ total_desafios }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <h3>Total de Estudiantes</h3>
+          <div class="value">{{ total_inscritos }}</div>
+        </div>
+        <div class="stat-card">
+          <h3>Tasa de Completación Promedio</h3>
+          <div class="value">{{ tasa_completacion_promedio }}%</div>
+        </div>
+        <div class="stat-card">
+          <h3>Promedio de Lecciones</h3>
+          <div class="value">{{ tasa_lecciones_promedio }}%</div>
+        </div>
+        <div class="stat-card">
+          <h3>Promedio de Desafíos</h3>
+          <div class="value">{{ tasa_desafios_promedio }}%</div>
+        </div>
+      </div>
+
+      <!-- Students List -->
+      <div>
+        {% if estudiantes %}
+          {% for estudiante in estudiantes %}
+            <div class="student-card">
+              <div class="student-header">
+                <div class="student-info">
+                  <h3>{{ estudiante.nombre }}</h3>
+                  <p>{{ estudiante.email }}</p>
+                  <p style="font-size: 0.85rem; color: #9ca3af;">Inscrito el: {{ estudiante.inscrito_en }}</p>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+                    <strong>Racha:</strong> {{ estudiante.racha }} 🔥
+                  </div>
+                  {% if estudiante.curso_completado %}
+                    <span class="badge-custom badge-success">Curso completado</span>
+                  {% else %}
+                    <span class="badge-custom badge-warning">En progreso</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Progress Bars -->
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <span style="color: #6b7280;">Progreso por Lecciones</span>
+                  <span style="color: var(--primary-color); font-weight: 600;">
+                    {{ estudiante.lecciones_completadas }}/{{ estudiante.total_lecciones_curso }} lecciones ({{ estudiante.porcentaje_lecciones }}%)
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" data-progress="{{ estudiante.porcentaje_lecciones }}">
+                    {% if estudiante.porcentaje_lecciones > 10 %}
+                      {{ estudiante.porcentaje_lecciones }}%
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; margin-top: 0.75rem; font-size: 0.875rem;">
+                  <span style="color: #6b7280;">Progreso por Desafíos</span>
+                  <span style="color: var(--primary-color); font-weight: 600;">
+                    {{ estudiante.desafios_completados }}/{{ estudiante.total_desafios_curso }} desafíos ({{ estudiante.porcentaje_desafios }}%)
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill progress-bar-fill-challenges" data-progress="{{ estudiante.porcentaje_desafios }}">
+                    {% if estudiante.porcentaje_desafios > 10 %}
+                      {{ estudiante.porcentaje_desafios }}%
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Challenges -->
+              {% if estudiante.desafios_detalle %}
+                <div class="challenges-list">
+                  <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 0.75rem; font-size: 0.95rem;">
+                    Desafíos Completados ({{ estudiante.desafios_intentados }} intentados)
+                  </div>
+                  {% for des in estudiante.desafios_detalle %}
+                    <div class="challenge-item {{ des.estado|lower }}">
+                      <div style="flex: 1;">
+                        <div class="challenge-title">{{ des.titulo }}</div>
+                        <div class="challenge-meta">
+                          <span>
+                            <span class="badge-custom 
+                              {% if des.dificultad == 'facil' %}
+                                badge-success
+                              {% elif des.dificultad == 'medio' %}
+                                badge-warning
+                              {% else %}
+                                badge-danger
+                              {% endif %}
+                            ">
+                              {% if des.dificultad == 'facil' %}Fácil
+                              {% elif des.dificultad == 'medio' %}Medio
+                              {% else %}Difícil{% endif %}
+                            </span>
+                          </span>
+                          <span>Intentos: {{ des.intentos }}</span>
+                          <span>Enviado: {{ des.enviado_en }}</span>
+                          {% if des.puntaje %}
+                            <span>Puntaje: {{ des.puntaje }} pts</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div style="text-align: right; margin-left: 1rem;">
+                        <span class="badge-custom 
+                          {% if des.estado == 'correcto' %}
+                            badge-success
+                          {% elif des.estado == 'incorrecto' %}
+                            badge-danger
+                          {% else %}
+                            badge-warning
+                          {% endif %}
+                        ">
+                          {% if des.estado == 'correcto' %}✓ Completado
+                          {% elif des.estado == 'incorrecto' %}✗ Incorrecto
+                          {% else %}⏳ Pendiente{% endif %}
+                        </span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div style="color: #9ca3af; padding: 1rem; text-align: center; font-size: 0.95rem;">
+                  Sin intentos en desafíos
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No hay estudiantes inscritos</p>
+            <p>Comparte el código del curso con tus estudiantes para que se inscriban</p>
+          </div>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.progress-bar-fill[data-progress]').forEach(function (bar) {
+        var raw = parseFloat(bar.getAttribute('data-progress') || '0');
+        var progress = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+        bar.style.width = progress + '%';
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

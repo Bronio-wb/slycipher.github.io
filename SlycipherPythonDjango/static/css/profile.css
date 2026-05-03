@@ -1,0 +1,59 @@
+:root{
+  --bg:#f8fafc;
+  --panel:#ffffff;
+  --brand:#263847;
+  --accent:#ff6b35;
+  --line:#e5e7eb;
+  --text:#111827;
+  --muted:#6b7280;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.topbar{height:64px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand img{width:36px;height:36px;border-radius:8px}
+.pill{font-size:12px;padding:5px 10px;border-radius:999px;background:var(--accent);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:14px}
+.topbar-right a{color:#fff;background:#dc2626;text-decoration:none;padding:6px 10px;border-radius:8px}
+.layout{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:240px;background:var(--panel);border-right:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:6px}
+.sidebar a{color:var(--text);text-decoration:none;padding:10px 12px;border-radius:10px;font-weight:500}
+.sidebar a:hover{background:#f3f4f6}
+.sidebar a.active{background:#ffedd5;color:#c2410c;font-weight:700}
+.main{flex:1;padding:28px;display:flex;flex-direction:column;gap:18px}
+.hero-card{background:linear-gradient(135deg,#263847 0%,#1f2d39 100%);border-radius:18px;padding:20px;display:grid;grid-template-columns:120px 1fr 260px;gap:18px;align-items:center;color:#fff;box-shadow:0 14px 35px rgba(38,56,71,.24)}
+.avatar-wrap{width:100px;height:100px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.avatar-wrap img{width:78%;height:78%;object-fit:contain}
+.hero-content h1{margin:0;font-size:30px;line-height:1.1}
+.hero-content p{margin:6px 0 10px;color:#dbe5ec}
+.role-badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.role-admin{background:#dbe7f3;color:#1f2d39}
+.role-developer{background:#ffedd5;color:#c2410c}
+.role-student{background:#dbeafe;color:#1d4ed8}
+.completion{background:rgba(255,255,255,.1);padding:14px;border:1px solid rgba(255,255,255,.15);border-radius:12px}
+.completion-label{font-size:12px;color:#dbe5ec;display:block}
+.completion-value{font-size:28px;font-weight:800;display:block;margin:4px 0 8px}
+.progress-bar{height:8px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent)}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+.card h2{margin:0 0 14px;color:var(--brand);font-size:20px}
+.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.info-grid.compact{grid-template-columns:1fr}
+.info-item{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fbfdff}
+.info-item span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:5px}
+.info-item strong{font-size:15px;color:var(--text)}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{text-decoration:none;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-light{background:#eef2f7;color:#1f2937}
+@media (max-width:1100px){
+  .hero-card{grid-template-columns:90px 1fr;}
+  .completion{grid-column:1/-1}
+  .grid{grid-template-columns:1fr}
+}
+@media (max-width:820px){
+  .sidebar{display:none}
+  .hero-content h1{font-size:24px}
+  .info-grid{grid-template-columns:1fr}
+}

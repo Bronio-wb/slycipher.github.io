@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ desafio.titulo|default:"Desafío" }} | Slycipher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f5f7fa; }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: white;
+            border-right: 1px solid #e0e0e0;
+        }
+        .sidebar .nav-link {
+            color: #6c757d;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover { background-color: #ffe5d9; color: #ff6b35; }
+        .sidebar .nav-link.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+        .desafio-header {
+            background: linear-gradient(135deg, #2c3a51 0%, #1a2332 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 28px 30px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        .code-display {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px 24px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.92rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark sticky-top" style="background-color: #ff6b35;">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Slycipher"
+                     style="width:30px;height:30px;margin-right:10px;object-fit:contain;"
+                     onerror="this.style.display='none'">
+                SLYCIPHER Student
+            </a>
+            <div class="d-flex align-items-center text-white">
+                <span class="me-3">Hola, <strong>{{ username }}</strong></span>
+                <span class="badge bg-warning text-dark me-3">
+                    <i class="bi bi-fire"></i> Racha: {{ racha }} días
+                </span>
+                <form action="{% url 'core:logout' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_dashboard' %}">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_courses' %}">
+                                <i class="bi bi-book"></i> Cursos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'core:student_challenges' %}">
+                                <i class="bi bi-trophy"></i> Desafíos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_progress' %}">
+                                <i class="bi bi-graph-up"></i> Mi Progreso
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:student_achievements' %}">
+                                <i class="bi bi-award"></i> Logros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:profile' %}">
+                                <i class="bi bi-person-circle"></i> Mi Perfil
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+
+                <!-- Challenge Header Card -->
+                <div class="desafio-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1 me-4">
+                            <h2 class="mb-2">{{ desafio.titulo|default:"Desafío" }}</h2>
+                            <p class="mb-3 opacity-90" style="line-height:1.6;">
+                                {{ desafio.descripcion|default:"" }}
+                            </p>
+                            <div class="d-flex gap-2 align-items-center flex-wrap">
+                                {% if desafio.dificultad %}
+                                    {% if desafio.dificultad == "Fácil" or desafio.dificultad == "Facil" %}
+                                        <span class="badge" style="background-color:#4a9fe5;">{{ desafio.dificultad }}</span>
+                                    {% elif desafio.dificultad == "Difícil" or desafio.dificultad == "Dificil" %}
+                                        <span class="badge" style="background-color:#dc3545;">{{ desafio.dificultad }}</span>
+                                    {% else %}
+                                        <span class="badge" style="background-color:#ff6b35;">{{ desafio.dificultad }}</span>
+                                    {% endif %}
+                                {% endif %}
+                                {% if desafio.course_id %}
+                                    <span class="badge bg-light text-dark">
+                                        <i class="bi bi-book"></i> Curso ID: {{ desafio.course_id }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <img src="{% static 'images/logo.png' %}" alt="Desafío"
+                             style="width:80px;height:80px;object-fit:contain;flex-shrink:0;"
+                             onerror="this.style.display='none'">
+                    </div>
+                </div>
+
+                <!-- Instructions + Expected Solution -->
+                <div class="card-custom">
+                    <h4 class="mb-3">
+                        <i class="bi bi-info-circle" style="color:#ff6b35;"></i> Instrucciones
+                    </h4>
+                    <p class="text-muted" style="line-height:1.7;">{{ desafio.descripcion|default:"Sin descripción." }}</p>
+
+                    {% if desafio.solucion %}
+                        <hr class="my-4">
+                        <h5 class="mb-3">Solución Esperada:</h5>
+                        <div class="code-display">{{ desafio.solucion }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- CTA Card -->
+                <div class="card-custom">
+                    <h4 class="mb-2">
+                        <i class="bi bi-code-square" style="color:#4a9fe5;"></i> ¿Listo para el Desafío?
+                    </h4>
+                    <p class="text-muted mb-4">Este desafío te ayudará a poner en práctica tus conocimientos y habilidades.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{% url 'core:student_challenges' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver a Desafíos
+                        </a>
+                        <a href="{% url 'core:student_challenge_attempt' desafio.challenge_id %}"
+                           class="btn" style="background-color:#ff6b35;color:white;">
+                            <i class="bi bi-play-circle"></i> Comenzar Desafío
+                        </a>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

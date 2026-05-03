@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Slycipher</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="Slycipher Logo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="tabs">
+            <a href="{% url 'core:login' %}" class="tab tab-inactive">Iniciar sesión</a>
+            <a href="{% url 'core:register' %}" class="tab tab-active">Registrarse</a>
+        </div>
+
+        <div class="social-buttons">
+            <a href="{% url 'core:oauth_github_start' %}?intent=register" class="social-btn btn-github">🔗 Iniciar con GitHub</a>
+            <a href="{% url 'core:oauth_google_start' %}?intent=register" class="social-btn btn-google">G Iniciar con Google</a>
+            <a href="{% url 'core:oauth_microsoft_start' %}?intent=register" class="social-btn btn-microsoft">Ⓜ Iniciar con Hotmail</a>
+        </div>
+
+        {% for msg in messages %}
+        <div class="alert alert-danger">{{ msg }}</div>
+        {% endfor %}
+
+        <form method="post" action="{% url 'core:register' %}" autocomplete="off">
+            {% csrf_token %}
+            <input type="text" name="fake_username" autocomplete="username" style="display:none">
+            <input type="password" name="fake_password" autocomplete="current-password" style="display:none">
+            {% if form.non_field_errors %}
+            <div class="field-error">{{ form.non_field_errors|join:", " }}</div>
+            {% endif %}
+            <div class="grid">
+                <div>
+                    <label class="form-label">Nombre</label>
+                    <input type="text" name="first_name" class="form-control" placeholder="Tu nombre" value="{{ form.first_name.value|default_if_none:'' }}" autocomplete="off">
+                    {% if form.first_name.errors %}<div class="field-error">{{ form.first_name.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div>
+                    <label class="form-label">Apellido</label>
+                    <input type="text" name="last_name" class="form-control" placeholder="Tu apellido" value="{{ form.last_name.value|default_if_none:'' }}" autocomplete="off">
+                    {% if form.last_name.errors %}<div class="field-error">{{ form.last_name.errors|join:", " }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label">Correo electrónico</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="correo@ejemplo.com" required value="{{ form.email.value|default_if_none:'' }}" autocomplete="off" autocapitalize="off" spellcheck="false">
+                {% if form.email.errors %}
+                <div class="field-error">{{ form.email.errors|join:", " }}</div>
+                {% endif %}
+                <div id="email-inline-error" class="field-error" style="display:none"></div>
+            </div>
+
+            <div class="grid">
+                <div>
+                    <label class="form-label">Tipo de Documento</label>
+                    <select name="tipo_documento" class="form-control select">
+                        <option value="">Seleccionar</option>
+                        <option value="CC" {% if form.tipo_documento.value == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="TI" {% if form.tipo_documento.value == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                        <option value="CE" {% if form.tipo_documento.value == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="PP" {% if form.tipo_documento.value == 'PP' %}selected{% endif %}>Pasaporte</option>
+                        <option value="NIT" {% if form.tipo_documento.value == 'NIT' %}selected{% endif %}>NIT</option>
+                    </select>
+                    {% if form.tipo_documento.errors %}<div class="field-error">{{ form.tipo_documento.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div>
+                    <label class="form-label">Número de Documento</label>
+                    <input type="text" name="numero_documento" class="form-control" placeholder="123456789" value="{{ form.numero_documento.value|default_if_none:'' }}" autocomplete="off">
+                    {% if form.numero_documento.errors %}<div class="field-error">{{ form.numero_documento.errors|join:", " }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input type="date" name="fecha_nacimiento" class="form-control" min="1920-01-01" max="2015-12-31" value="{{ form.fecha_nacimiento.value|default_if_none:'' }}" autocomplete="off">
+                {% if form.fecha_nacimiento.errors %}<div class="field-error">{{ form.fecha_nacimiento.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">Contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" class="form-control" required autocomplete="new-password">
+                                        <button type="button" class="password-toggle" data-target="password" aria-label="Mostrar contraseña">
+                                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <circle class="eye-pupil" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/>
+                                                <line class="eye-slash" x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                </div>
+                <div class="password-hints">
+                    <ul>
+                        <li data-rule="length">8-20 caracteres</li>
+                        <li data-rule="upper">Una letra mayúscula</li>
+                        <li data-rule="lower">Una letra minúscula</li>
+                        <li data-rule="digit">Un número</li>
+                        <li data-rule="symbol">Un símbolo (@$!%*?&)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label">Confirmar Contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password2" id="password2" class="form-control" required autocomplete="new-password">
+                                        <button type="button" class="password-toggle" data-target="password2" aria-label="Mostrar contraseña">
+                                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/>
+                                            </svg>
+                                        </button>
+                </div>
+                {% if form.password2.errors %}<div class="field-error">{{ form.password2.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <button type="submit" class="btn-submit">Registrarse</button>
+        </form>
+
+        <div class="register-link">¿Ya tienes cuenta? <a href="{% url 'core:login' %}">Inicia sesión</a></div>
+    </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                {% if not form.errors %}
+                    const email = document.getElementById('email');
+                    const password = document.getElementById('password');
+                    const password2 = document.getElementById('password2');
+                    if (email) email.value = '';
+                    if (password) password.value = '';
+                    if (password2) password2.value = '';
+                {% endif %}
+            });
+        </script>
+        <script src="{% static 'js/register.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Estudiante | SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    .stat-card { border-radius: 12px; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-icon { font-size: 2.5rem; }
+    .action-btn {
+      border-radius: 12px; padding: 20px; font-weight: 600;
+      transition: all 0.3s; text-decoration: none; display: block;
+    }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .course-card {
+      border-radius: 12px; transition: all 0.3s; border: 1px solid #e0e0e0;
+      height: 220px; display: flex; flex-direction: column;
+    }
+    .course-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
+    .course-card .description {
+      overflow: hidden; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      line-height: 1.4; max-height: 2.8em;
+    }
+    .badge-level { padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .sidebar { min-height: calc(100vh - 56px); background: white; border-right: 1px solid #e0e0e0; }
+    .sidebar .nav-link { color: #6c757d; padding: 12px 20px; border-radius: 8px; margin: 4px 8px; transition: all 0.3s; }
+    .sidebar .nav-link:hover { background-color: #ffe5d9; color: #ff6b35; }
+    .sidebar .nav-link.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .sidebar .nav-link i { margin-right: 8px; }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #ff6b35;">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Slycipher" style="width:30px;height:30px;margin-right:10px;object-fit:contain;">
+        SLYCIPHER Student
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <span class="nav-link">Hola, <strong>{{ user.username }}</strong></span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link">🔥 Racha: <strong>{{ racha }}</strong> días</span>
+          </li>
+          <li class="nav-item">
+            <a href="/logout/" class="btn btn-danger btn-sm ms-2 mt-1">Cerrar Sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Layout -->
+  <div class="container-fluid">
+    <div class="row">
+
+      <!-- Sidebar -->
+      <nav class="col-md-2 d-md-block sidebar p-0">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'core:student_dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:student_courses' %}">
+                <i class="bi bi-book"></i> Cursos
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:student_challenges' %}">
+                <i class="bi bi-trophy"></i> Desafíos
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:student_progress' %}">
+                <i class="bi bi-graph-up"></i> Mi Progreso
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:student_achievements' %}">
+                <i class="bi bi-award"></i> Logros
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:profile' %}">
+                <i class="bi bi-person-circle"></i> Mi Perfil
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Contenido Principal -->
+      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+          <h2 class="mb-0">Mi Panel de Aprendizaje</h2>
+        </div>
+
+        <!-- Tarjetas de Estadísticas -->
+        <div class="row g-3 mb-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white border-0 shadow-sm p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="text-muted mb-1 small">Cursos Inscritos</p>
+                  <h3 class="mb-0 fw-bold">{{ cursos_inscritos }}</h3>
+                </div>
+                <div class="stat-icon">📚</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white border-0 shadow-sm p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="text-muted mb-1 small">Lecciones Completadas</p>
+                  <h3 class="mb-0 fw-bold">{{ lecciones_completadas }}</h3>
+                </div>
+                <div class="stat-icon">✅</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white border-0 shadow-sm p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="text-muted mb-1 small">Desafíos Resueltos</p>
+                  <h3 class="mb-0 fw-bold">{{ desafios_resueltos }}</h3>
+                </div>
+                <div class="stat-icon">🎯</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white border-0 shadow-sm p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="text-muted mb-1 small">Logros Obtenidos</p>
+                  <h3 class="mb-0 fw-bold">{{ logros }}</h3>
+                </div>
+                <div class="stat-icon">🏆</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cursos Disponibles -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0">Cursos Disponibles</h5>
+              <a href="{% url 'core:student_courses' %}" class="btn btn-sm text-white" style="background-color:#ff6b35;">Ver Todos</a>
+            </div>
+            {% if cursos_disponibles %}
+            <div class="row g-3">
+              {% for curso in cursos_disponibles %}
+              <div class="col-lg-4 col-md-6">
+                <div class="course-card bg-white p-3">
+                  <div class="mb-2">
+                    {% with nivel=curso.nivel|lower %}
+                      {% if 'principi' in nivel %}
+                        <span class="badge-level bg-success text-white">{{ curso.nivel }}</span>
+                      {% elif 'inter' in nivel %}
+                        <span class="badge-level bg-warning text-dark">{{ curso.nivel }}</span>
+                      {% else %}
+                        <span class="badge-level bg-danger text-white">{{ curso.nivel|default:"Sin nivel" }}</span>
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                  <h6 class="fw-bold mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ curso.titulo }}</h6>
+                  <p class="text-muted small mb-3 description">{{ curso.descripcion|default:"Sin descripción" }}</p>
+                  <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <small class="text-muted">
+                      <i class="bi bi-tag"></i> {{ curso.categoria|default:"Sin categoría" }}
+                    </small>
+                    <a href="{% url 'core:student_course_detail' curso.id %}" class="btn btn-sm text-white" style="background-color:#ff6b35;">
+                      Ver Curso
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-inbox" style="font-size:3rem;color:#ddd;"></i>
+              <p class="text-muted mt-3 mb-0">No hay cursos disponibles en este momento</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Progreso Reciente + Acciones Rápidas -->
+        <div class="row g-4 mb-4">
+
+          <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h5 class="fw-bold mb-3">Progreso Reciente</h5>
+                {% if progreso_reciente %}
+                  {% for progreso in progreso_reciente %}
+                  <div class="progress-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <div>
+                        <h6 class="mb-0">{{ progreso.titulo|default:'Lección' }}</h6>
+                        <small class="text-muted">{{ progreso.curso|default:'Progreso del curso' }}</small>
+                      </div>
+                      <span class="badge" style="background-color: #ff6b35;">Completado</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar" style="width: 100%; background-color: #ff6b35;" role="progressbar"></div>
+                    </div>
+                    <small class="mt-1 d-block" style="color: #ff6b35;">100%</small>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-center py-4">
+                    <p class="text-muted mb-3">No tienes cursos en progreso aún</p>
+                    <a href="{% url 'core:student_courses' %}" class="btn btn-sm text-white" style="background-color:#ff6b35;">
+                      Explorar Cursos
+                    </a>
+                  </div>
+                {% endif %}
+                <div class="text-center mt-2">
+                  <a href="{% url 'core:student_progress' %}" class="text-decoration-none" style="color:#ff6b35;">Ver todo mi progreso</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h5 class="fw-bold mb-3">Acciones Rápidas</h5>
+                <a href="{% url 'core:student_courses' %}" class="btn w-100 text-white action-btn mb-3"
+                   style="background: linear-gradient(135deg, #3d4f6d 0%, #2c3a51 100%);">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Explorar Cursos</span>
+                    <span style="font-size:1.5rem;">📖</span>
+                  </div>
+                </a>
+                <a href="{% url 'core:student_progress' %}" class="btn w-100 text-white action-btn mb-3"
+                   style="background: linear-gradient(135deg, #ff6b35 0%, #ff4500 100%);">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Ver Mi Progreso</span>
+                    <span style="font-size:1.5rem;">✅</span>
+                  </div>
+                </a>
+                <a href="{% url 'core:student_achievements' %}" class="btn w-100 text-white action-btn"
+                   style="background: linear-gradient(135deg, #3d4f6d 0%, #2c3a51 100%);">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Mis Logros</span>
+                    <span style="font-size:1.5rem;">🏆</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-top mt-5 py-3">
+    <div class="container text-center">
+      <span class="text-muted">© 2024 Slycipher - Plataforma de Aprendizaje</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

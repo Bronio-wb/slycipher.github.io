@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logros | Slycipher</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f5f7fa; }
+    .sidebar {
+      min-height: calc(100vh - 56px);
+      background: white;
+      border-right: 1px solid #e0e0e0;
+    }
+    .sidebar .nav-link {
+      color: #6c757d;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 4px 8px;
+      transition: all 0.25s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #ffe5d9;
+      color: #ff6b35;
+    }
+    .sidebar .nav-link.active {
+      background-color: #ff6b35;
+      color: white;
+      font-weight: 600;
+    }
+    .sidebar .nav-link i { margin-right: 8px; }
+    .achievement-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.25s;
+      height: 100%;
+      border: 2px solid transparent;
+    }
+    .achievement-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .achievement-card.unlocked {
+      border-color: #ff6b35;
+    }
+    .achievement-card.locked {
+      opacity: 0.6;
+      filter: grayscale(85%);
+    }
+    .achievement-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      color: #9ca3af;
+    }
+    .achievement-card.unlocked .achievement-icon.bronze { color: #CD7F32; }
+    .achievement-card.unlocked .achievement-icon.silver { color: #C0C0C0; }
+    .achievement-card.unlocked .achievement-icon.gold { color: #FFD700; }
+    .achievement-card.unlocked .achievement-icon.fire { color: #ef4444; }
+    .achievement-card.unlocked .achievement-icon.ice { color: #38bdf8; }
+    .achievement-card.unlocked .achievement-icon.purple { color: #8b5cf6; }
+    .summary-card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #ff6b35 0%, #ff4500 100%);">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Slycipher" style="width: 30px; height: 30px; margin-right: 10px; object-fit: contain;">
+        SLYCIPHER Student
+      </a>
+      <div class="d-flex align-items-center text-white">
+        <span class="me-3">Hola, <strong>{{ user.username }}</strong></span>
+        <span class="badge bg-warning text-dark me-3">
+          <i class="bi bi-fire"></i> Racha: {{ racha|default:0 }} días
+        </span>
+        <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-md-block sidebar p-0">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_courses' %}"><i class="bi bi-book"></i> Cursos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_challenges' %}"><i class="bi bi-trophy"></i> Desafíos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_progress' %}"><i class="bi bi-graph-up"></i> Mi Progreso</a></li>
+            <li class="nav-item"><a class="nav-link active" href="{% url 'core:student_achievements' %}"><i class="bi bi-trophy"></i> Logros</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:profile' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+        <h2 class="mb-4"><i class="bi bi-trophy text-warning"></i> Mis Logros</h2>
+
+        <div class="row mb-4">
+          <div class="col-md-4 mb-3">
+            <div class="summary-card p-4 text-white" style="background: linear-gradient(135deg, #2c3a51 0%, #1a2332 100%);">
+              <h5>Lecciones Completadas</h5>
+              <h2 class="mb-0">{{ lecciones_completadas|default:0 }}</h2>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="summary-card p-4 text-white" style="background-color: #ff6b35;">
+              <h5>Racha Actual</h5>
+              <h2 class="mb-0">{{ racha|default:0 }} días</h2>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="summary-card p-4 text-white" style="background-color: #4a9fe5;">
+              <h5>Logros Desbloqueados</h5>
+              <h2 class="mb-0">{{ desbloqueados|default:0 }}/{{ total_logros|default:0 }}</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          {% for logro in achievements %}
+          <div class="col-md-4 mb-4">
+            <div class="achievement-card {% if logro.unlocked %}unlocked{% else %}locked{% endif %}">
+              <div class="achievement-icon {{ logro.accent }}">
+                <i class="bi {{ logro.icon }}"></i>
+              </div>
+              <h5>{{ logro.title }}</h5>
+              <p class="text-muted">{{ logro.description }}</p>
+
+              <div class="progress mt-2" style="height: 8px;">
+                <div class="progress-bar" style="width: {{ logro.progress }}%; background-color: #ff6b35;"></div>
+              </div>
+              <small class="text-muted">{{ logro.current }}/{{ logro.target }}</small>
+              <br>
+
+              {% if logro.unlocked %}
+                <span class="badge bg-success mt-2"><i class="bi bi-check-circle-fill"></i> Desbloqueado</span>
+              {% else %}
+                <span class="badge bg-secondary mt-2"><i class="bi bi-lock-fill"></i> Bloqueado</span>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

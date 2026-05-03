@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soluciones Pendientes - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f9fafb; }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .solution-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge" style="background-color: #ff6b35;">Revisar Soluciones</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}" class="active">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-1">Soluciones Pendientes de Revisión</h2>
+          <p class="text-muted mb-0">Evalúa las entregas enviadas por estudiantes</p>
+        </div>
+        <span class="badge bg-warning text-dark fs-6">Pendientes: {{ total_pendientes }}</span>
+      </div>
+
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if soluciones %}
+        {% for solucion in soluciones %}
+          <div class="solution-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="mb-2">{{ solucion.desafioTitulo }}</h5>
+                <p class="mb-1 text-muted"><strong>Curso:</strong> {{ solucion.cursoTitulo|default:'N/A' }}</p>
+                <p class="mb-1"><strong>Estudiante ID:</strong> {{ solucion.userId }}</p>
+                <p class="mb-0 text-muted"><strong>Enviado:</strong> {{ solucion.enviadoEn|date:'d/m/Y H:i' }}</p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark">Pendiente</span>
+                <a href="{% url 'core:developer_review_solution' solucion.submissionId %}" class="btn btn-primary btn-sm">
+                  <i class="bi bi-eye"></i> Revisar
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-5 bg-white rounded-3 border">
+          <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+          <h4 class="mt-3">¡Todo al día!</h4>
+          <p class="text-muted mb-0">No hay soluciones pendientes por revisar.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ course.title }}</title>
+  </head>
+  <body>
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.description }}</p>
+    <p>Creado: {{ course.created_at }} | Actualizado: {{ course.updated_at }}</p>
+    <p>
+      <a href="{% url 'core:course_update' course.pk %}">Editar</a> |
+      <a href="{% url 'core:course_delete' course.pk %}">Eliminar</a> |
+      <a href="{% url 'core:course_list' %}">Volver</a>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ leccion.titulo }} | Slycipher</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <style>
+    .sidebar {
+      min-height: calc(100vh - 56px);
+      background: white;
+      border-right: 1px solid #e0e0e0;
+    }
+    .sidebar .nav-link {
+      color: #6c757d;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 4px 8px;
+      transition: all 0.25s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #ffe5d9;
+      color: #ff6b35;
+    }
+    .sidebar .nav-link.active {
+      background-color: #ffe5d9;
+      color: #ff6b35;
+      font-weight: 600;
+    }
+    .sidebar .nav-link i {
+      margin-right: 8px;
+    }
+    .CodeMirror {
+      height: 260px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: Consolas, 'Fira Mono', monospace;
+    }
+    .lesson-content {
+      line-height: 1.75;
+      color: #374151;
+      white-space: pre-wrap;
+    }
+    .output-box {
+      background-color: #111827;
+      color: #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 88px;
+      font-family: Consolas, monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  {% if messages %}
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080; margin-top: 70px;">
+    {% for message in messages %}
+      <div class="toast align-items-center text-bg-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}primary{% endif %} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #ff6b35;">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:student_dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Slycipher" style="width:30px;height:30px;margin-right:10px;object-fit:contain;">
+        SLYCIPHER Student
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><span class="nav-link">Hola, <strong>{{ user.username }}</strong></span></li>
+          <li class="nav-item"><span class="nav-link">🔥 Racha: <strong>{{ racha|default:0 }}</strong> días</span></li>
+          <li class="nav-item"><a href="/logout/" class="btn btn-danger btn-sm ms-2 mt-1">Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-md-block sidebar p-0">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link active" href="{% url 'core:student_courses' %}"><i class="bi bi-book"></i> Cursos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_challenges' %}"><i class="bi bi-trophy"></i> Desafíos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_progress' %}"><i class="bi bi-graph-up"></i> Mi Progreso</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:student_achievements' %}"><i class="bi bi-award"></i> Logros</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'core:profile' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-none" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:student_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:student_courses' %}">Cursos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:student_course_detail' curso.id %}">{{ curso.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ leccion.titulo }}</li>
+          </ol>
+        </nav>
+
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h2 class="mb-2">{{ leccion.titulo }}</h2>
+                <p class="text-muted mb-0"><i class="bi bi-clock"></i> Lección del curso {{ curso.titulo }}</p>
+              </div>
+              <a href="{% url 'core:student_course_detail' curso.id %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Volver al curso
+              </a>
+            </div>
+            <div class="mb-2">
+              {% if leccion_completada %}
+                <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Lección completada</span>
+              {% else %}
+                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pendiente</span>
+              {% endif %}
+            </div>
+            <hr class="my-4">
+            <div class="lesson-content">{{ leccion.contenido|default:'Sin contenido disponible.' }}</div>
+          </div>
+        </div>
+
+        {% if leccion.codigo_ejemplo %}
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h5 class="mb-2"><i class="bi bi-lightbulb"></i> Código de Ejemplo</h5>
+            <p class="text-muted mb-3">Referencia proporcionada por el instructor.</p>
+            <textarea id="codeExample">{{ leccion.codigo_ejemplo }}</textarea>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h5 class="mb-2"><i class="bi bi-code-square"></i> Editor de Código</h5>
+            <p class="text-muted mb-3">Prueba tu solución aquí (modo práctica local).</p>
+            <textarea id="codeEditor"></textarea>
+            <div class="d-flex gap-2 mt-3">
+              <button id="runCode" class="btn btn-success"><i class="bi bi-play-fill"></i> Ejecutar Código</button>
+              <button id="clearCode" class="btn btn-outline-secondary"><i class="bi bi-trash"></i> Limpiar</button>
+              <button id="showHint" class="btn btn-outline-primary" {% if not leccion.codigo_ejemplo %}disabled{% endif %}><i class="bi bi-lightbulb"></i> {% if leccion.codigo_ejemplo %}Mostrar ejemplo{% else %}Sin ejemplo disponible{% endif %}</button>
+            </div>
+            <div class="mt-3">
+              <h6 class="mb-2">Salida:</h6>
+              <div id="output" class="output-box">Presiona "Ejecutar Código" para ver los resultados...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between">
+              {% if leccion_anterior %}
+                <a href="{% url 'core:student_lesson_detail' leccion_anterior.id %}" class="btn btn-secondary">
+                  <i class="bi bi-chevron-left"></i> Lección anterior
+                </a>
+              {% else %}
+                <button class="btn btn-secondary" disabled><i class="bi bi-chevron-left"></i> Lección anterior</button>
+              {% endif %}
+
+              {% if leccion_completada %}
+                <button class="btn btn-success" disabled>
+                  <i class="bi bi-check-circle-fill"></i> Completada
+                </button>
+              {% else %}
+                <form action="{% url 'core:student_lesson_complete' leccion.id %}" method="post" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Marcar como Completada
+                  </button>
+                </form>
+              {% endif %}
+
+              {% if leccion_siguiente %}
+                <a href="{% url 'core:student_lesson_detail' leccion_siguiente.id %}" class="btn btn-primary">
+                  Siguiente lección <i class="bi bi-chevron-right"></i>
+                </a>
+              {% else %}
+                <button class="btn btn-primary" disabled>Siguiente lección <i class="bi bi-chevron-right"></i></button>
+              {% endif %}
+            </div>
+
+            {% if leccion_completada %}
+              <div class="alert alert-success mt-3 mb-0 d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                  <strong>Progreso guardado.</strong> Esta lección ya quedó marcada como completada.
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="bg-white border-top mt-5 py-3">
+    <div class="container text-center">
+      <span class="text-muted">© 2024 Slycipher - Plataforma de Aprendizaje</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script>
+    document.querySelectorAll('.toast').forEach(function (toastEl) {
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+
+    const executeUrl = '{% url "core:student_code_execute" %}';
+    const csrfToken = '{{ csrf_token }}';
+    const codeMode = '{{ code_mode|default:"python" }}';
+    const defaultCode = codeMode === 'text/x-java'
+      ? 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hola SLYCIPHER");\n    }\n}'
+      : '# Escribe tu código aquí\nprint("Hola SLYCIPHER")';
+
+    const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+      mode: codeMode,
+      theme: 'dracula',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      lineWrapping: true,
+      value: defaultCode,
+    });
+    editor.setValue(defaultCode);
+
+    const exampleEl = document.getElementById('codeExample');
+    let exampleEditor = null;
+    if (exampleEl) {
+      exampleEditor = CodeMirror.fromTextArea(exampleEl, {
+        mode: codeMode,
+        theme: 'dracula',
+        lineNumbers: true,
+        readOnly: true,
+        lineWrapping: true,
+      });
+    }
+
+    document.getElementById('clearCode').addEventListener('click', function () {
+      editor.setValue('');
+      document.getElementById('output').textContent = 'Editor limpiado. Sigue practicando.';
+    });
+
+    document.getElementById('runCode').addEventListener('click', function () {
+      const outputEl = document.getElementById('output');
+      const code = editor.getValue();
+      const lenguaje = codeMode === 'text/x-java' ? 'java' : 'python';
+
+      if (!code.trim()) {
+        outputEl.textContent = 'No hay código para ejecutar. Escribe algo primero.';
+        return;
+      }
+
+      outputEl.textContent = 'Ejecutando código...';
+
+      fetch(executeUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({ codigo: code, lenguaje: lenguaje }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          outputEl.textContent = data.error;
+          return;
+        }
+        outputEl.textContent = data.salida || '(sin salida)';
+      })
+      .catch(() => {
+        outputEl.textContent = 'No se pudo ejecutar el código. Intenta de nuevo.';
+      });
+    });
+
+    document.getElementById('showHint').addEventListener('click', function () {
+      if (exampleEditor) {
+        editor.setValue(exampleEditor.getValue());
+        document.getElementById('output').textContent = 'Se copió el código de ejemplo al editor.';
+      } else {
+        document.getElementById('output').textContent = 'Esta lección no incluye código de ejemplo.';
+      }
+    });
+
+    editor.setOption('extraKeys', {
+      'Ctrl-Enter': function() {
+        document.getElementById('runCode').click();
+        return false;
+      },
+      'Cmd-Enter': function() {
+        document.getElementById('runCode').click();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>

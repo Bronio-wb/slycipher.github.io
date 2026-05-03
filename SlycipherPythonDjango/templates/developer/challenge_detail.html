@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Desafío - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f9fafb; }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .detail-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .difficulty-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .difficulty-facil { background-color: #4a9fe5; color: white; }
+    .difficulty-medio { background-color: #ff6b35; color: white; }
+    .difficulty-dificil { background-color: #2c3a51; color: white; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge" style="background-color: #ff6b35;">Detalle del Desafío</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}" class="active"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle del Desafío</h2>
+        <div class="d-flex gap-2">
+          <a href="{% url 'core:developer_challenge_edit' desafio.id %}" class="btn" style="background-color: #ffc107; color: #000;">
+            <i class="bi bi-pencil"></i> Editar
+          </a>
+          <a href="{% url 'core:developer_challenges' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+          </a>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <h3 class="mb-0">{{ desafio.titulo }}</h3>
+          {% with diff=desafio.dificultad|lower %}
+            {% if diff == 'fácil' %}
+              <span class="difficulty-badge difficulty-facil">{{ desafio.dificultad }}</span>
+            {% elif diff == 'difícil' %}
+              <span class="difficulty-badge difficulty-dificil">{{ desafio.dificultad }}</span>
+            {% else %}
+              <span class="difficulty-badge difficulty-medio">{{ desafio.dificultad }}</span>
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p class="mb-1"><strong>Curso:</strong> {{ desafio.curso_titulo }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="mb-1"><strong>Lenguaje:</strong> {{ desafio.lenguaje }}</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <h5 class="mt-4 mb-3">Descripción del Problema</h5>
+        <p class="text-muted">{{ desafio.descripcion|default:'Sin descripción' }}</p>
+
+        {% if desafio.solucion %}
+          <hr>
+          <h5 class="mt-4 mb-3">Solución (Código)</h5>
+          <pre><code>{{ desafio.solucion }}</code></pre>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

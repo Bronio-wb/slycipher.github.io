@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestión de Usuarios - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_users.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+      <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}" class="active">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="#">Lecciones</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+      <div class="quick-links">
+        <a href="{% url 'core:users' %}?role=admin">Admin</a>
+        <a href="{% url 'core:users' %}?role=developer">Desarrolladores</a>
+        <a href="{% url 'core:users' %}?role=student">Estudiantes</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="card">
+        {% if messages %}
+          {% for message in messages %}
+            <div style="margin-bottom:12px;padding:12px 14px;border-radius:10px;{% if 'success' in message.tags %}background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;{% else %}background:#fee2e2;color:#991b1b;border:1px solid #fecaca;{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <a href="{% url 'core:user_create' %}" class="btn btn-primary">Crear Usuario</a>
+            <input id="search" name="q" value="{{ query|default:'' }}" placeholder="Buscar usuario..." class="search-input">
+          </div>
+          <div class="toolbar-right">
+            <label>Role</label>
+            <select id="roleFilter" class="select-filter" name="role">
+              <option value="" {% if not selected_role %}selected{% endif %}>Todos</option>
+              <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="developer" {% if selected_role == 'developer' %}selected{% endif %}>Developer</option>
+              <option value="student" {% if selected_role == 'student' %}selected{% endif %}>Student</option>
+            </select>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>ID</th><th>Username</th><th>Nombre Completo</th><th>Email</th><th>Rol</th><th>Estado</th><th>Fecha Registro</th><th>Acciones</th></tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{% if u.legacy_id %}{{ u.legacy_id }}{% else %}{{ u.id }}{% endif %}</td>
+              <td>{{ u.username }}</td>
+              <td>{{ u.full_name }}</td>
+              <td>{{ u.email }}</td>
+              <td>
+                {% if 'admin' in u.role|lower %}
+                  <span class="badge badge-dark">ADMIN</span>
+                {% elif 'desar' in u.role|lower or 'dev' in u.role|lower or 'develop' in u.role|lower or 'developer' in u.role|lower %}
+                  <span class="badge badge-orange">DEVELOPER</span>
+                {% else %}
+                  <span class="badge badge-blue">STUDENT</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.is_active %}
+                  <button class="status-btn status-active{% if u.id == request.user.id %} status-disabled{% endif %}" data-url="{% url 'core:user_toggle_active' u.id %}" data-user-id="{{ u.id }}" {% if u.id == request.user.id %}disabled title="No puedes cambiar el estado de tu propio usuario"{% endif %}>Activo</button>
+                {% else %}
+                  <button class="status-btn status-inactive{% if u.id == request.user.id %} status-disabled{% endif %}" data-url="{% url 'core:user_toggle_active' u.id %}" data-user-id="{{ u.id }}" {% if u.id == request.user.id %}disabled title="No puedes cambiar el estado de tu propio usuario"{% endif %}>Inactivo</button>
+                {% endif %}
+              </td>
+              <td>{{ u.date_joined|date:'d/m/Y' }}</td>
+              <td class="actions">
+                <a class="btn" href="{% url 'core:user_edit' u.id %}">✏️</a>
+                <form method="post" action="{% url 'core:user_delete' u.id %}" data-username="{{ u.username }}">{% csrf_token %}<button class="btn btn-danger" type="submit">🗑️</button></form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cards">
+        <div class="card"><h4>Total Usuarios</h4><p class="stat-value stat-blue">{{ users|length }}</p></div>
+        <div class="card"><h4>Administradores</h4><p class="stat-value stat-red">{{ admin_count }}</p></div>
+        <div class="card"><h4>Desarrolladores</h4><p class="stat-value stat-orange">{{ dev_count }}</p></div>
+        <div class="card"><h4>Estudiantes</h4><p class="stat-value stat-green">{{ student_count }}</p></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="{% static 'js/admin_users.js' %}"></script>
+</body>
+</html>

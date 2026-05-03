@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Resultado del Reporte - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_report_result.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="#">Lecciones</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}" class="active">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <div class="header-actions">
+        <h1>Resultado del Reporte</h1>
+        <div class="actions">
+          <button onclick="window.print()">🖨️ Imprimir</button>
+          <a href="{% url 'core:admin_reports' %}">← Nuevo Reporte</a>
+        </div>
+      </div>
+
+      <div class="card-title">
+        {% if tipo_reporte == 'usuarios' %}<h2>👥 Reporte de Usuarios</h2>{% endif %}
+        {% if tipo_reporte == 'cursos' %}<h2>📚 Reporte de Cursos</h2>{% endif %}
+        {% if tipo_reporte == 'progreso' %}<h2>📊 Reporte de Progreso</h2>{% endif %}
+        {% if tipo_reporte == 'general' %}<h2>📈 Reporte General</h2>{% endif %}
+        <p>Total de registros: <strong>{{ total_registros }}</strong></p>
+      </div>
+
+      {% if filtros %}
+      <div class="filters-box">
+        <h3>Filtros aplicados:</h3>
+        <div class="chips">
+          {% for f in filtros %}
+            <span class="chip">{{ f }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if tipo_reporte == 'usuarios' %}
+      <div class="kpis report-user-kpis">
+        <div class="kpi"><span>{{ usuarios|length }}</span><small>Total Usuarios</small></div>
+        <div class="kpi"><span>{{ usuarios_activos }}</span><small>Activos</small></div>
+        <div class="kpi"><span>{{ usuarios_inactivos }}</span><small>Inactivos</small></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Fecha Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td><span class="badge">{{ u.rol }}</span></td>
+              <td>{% if u.activo %}<span class="ok">Activo</span>{% else %}<span class="off">Inactivo</span>{% endif %}</td>
+              <td>{{ u.creado_en|default:'N/A' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty">Sin resultados</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      {% if tipo_reporte == 'cursos' %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Descripción</th>
+              <th>Nivel</th>
+              <th>Lenguaje</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cursos %}
+            <tr>
+              <td>{{ c.titulo }}</td>
+              <td>{{ c.descripcion }}</td>
+              <td>{{ c.nivel|default:'N/A' }}</td>
+              <td>{{ c.lenguaje|default:'N/A' }}</td>
+              <td>{{ c.estado|default:'N/A' }}</td>
+              <td>{{ c.fecha|default:'N/A' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="empty">Sin resultados</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      {% if tipo_reporte == 'progreso' %}
+      <section class="progress-report-wrap">
+        <h2 class="progress-title">Resumen de Progreso</h2>
+        <div class="progress-divider"></div>
+
+        <div class="progress-kpis">
+          <div class="progress-kpi"><span>{{ total_usuarios }}</span><small>Total Usuarios</small></div>
+          <div class="progress-kpi"><span>{{ total_cursos }}</span><small>Total Cursos</small></div>
+          <div class="progress-kpi"><span>{{ usuarios_activos }}</span><small>Usuarios Activos</small></div>
+          <div class="progress-kpi"><span>{{ racha_promedio }}</span><small>Racha Promedio</small></div>
+        </div>
+
+        <h3 class="progress-subtitle">Top 10 Usuarios por Racha</h3>
+        <div class="table-wrap progress-table-wrap">
+          <table class="progress-table">
+            <thead>
+              <tr>
+                <th>Posición</th>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Racha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in top_usuarios_racha %}
+              <tr>
+                <td>{{ u.posicion }}</td>
+                <td>{{ u.usuario }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.racha }} días</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="empty">Sin resultados</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if tipo_reporte == 'general' %}
+      <div class="kpis">
+        <div class="kpi"><span>{{ total_usuarios }}</span><small>Total Usuarios</small></div>
+        <div class="kpi"><span>{{ usuarios_activos }}</span><small>Usuarios Activos</small></div>
+        <div class="kpi"><span>{{ total_cursos }}</span><small>Total Cursos</small></div>
+        <div class="kpi"><span>{{ cursos_activos }}</span><small>Cursos Activos</small></div>
+      </div>
+      {% endif %}
+    </main>
+  </div>
+</body>
+</html>

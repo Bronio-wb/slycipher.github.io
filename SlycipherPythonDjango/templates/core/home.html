@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slycipher | Aprende programación con práctica real</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}?v=20260324-2">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a href="{% url 'core:home' %}" class="brand">
+                <img src="{% static 'images/logo.png' %}" alt="Slycipher Logo">
+                <div>
+                    <strong>SLYCIPHER</strong>
+                    <span>Aprende. Practica. Avanza.</span>
+                </div>
+            </a>
+            <nav class="top-actions">
+                <a href="{% url 'core:login' %}" class="link-btn">Iniciar sesión</a>
+                <a href="{% url 'core:register' %}" class="solid-btn">Crear cuenta</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">PLATAFORMA DE APRENDIZAJE</span>
+                    <h1>Conviértete en desarrollador con rutas guiadas, retos y práctica real.</h1>
+                    <p>
+                        Slycipher te ayuda a aprender programación desde cero con cursos estructurados,
+                        desafíos interactivos y seguimiento de progreso para Python, Java, JavaScript y más.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="{% url 'core:register' %}" class="solid-btn large">Empieza gratis</a>
+                        <a href="{% url 'core:login' %}" class="outline-btn large">Ya tengo cuenta</a>
+                    </div>
+
+                    <div class="hero-metrics">
+                        <article>
+                            <strong>+{{ total_cursos }}</strong>
+                            <span>Cursos prácticos</span>
+                        </article>
+                        <article>
+                            <strong>+{{ total_desafios }}</strong>
+                            <span>Retos interactivos</span>
+                        </article>
+                        <article>
+                            <strong>+{{ total_usuarios }}</strong>
+                            <span>Estudiantes en la plataforma</span>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <span class="status-pill">Ruta destacada</span>
+                        <span class="muted-pill">Principiante a Pro</span>
+                    </div>
+
+                    <h2>Tu camino de aprendizaje en un solo lugar</h2>
+                    <p>Explora lecciones, resuelve desafíos y visualiza tu progreso con una experiencia clara y moderna.</p>
+
+                    <div class="stack-cards">
+                        <div class="mini-card">
+                            <span class="mini-icon">01</span>
+                            <div>
+                                <strong>Aprende conceptos</strong>
+                                <p>Lecciones cortas, claras y enfocadas en resultados.</p>
+                            </div>
+                        </div>
+                        <div class="mini-card">
+                            <span class="mini-icon">02</span>
+                            <div>
+                                <strong>Practica con retos</strong>
+                                <p>Ejercicios diseñados para reforzar cada tema.</p>
+                            </div>
+                        </div>
+                        <div class="mini-card">
+                            <span class="mini-icon">03</span>
+                            <div>
+                                <strong>Mide tu avance</strong>
+                                <p>Progreso visible para mantener la constancia.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section light-section">
+            <div class="container">
+                <div class="section-heading center">
+                    <span class="eyebrow blue">¿POR QUÉ SLYCIPHER?</span>
+                    <h2>Una experiencia de aprendizaje diseñada para avanzar de verdad</h2>
+                    <p>Todo lo que necesitas para estudiar, practicar y mantener tu motivación en una misma plataforma.</p>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <span class="feature-icon blue">&lt;/&gt;</span>
+                        <h3>Cursos estructurados</h3>
+                        <p>Contenido ordenado por niveles para aprender paso a paso sin perderte en el proceso.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="feature-icon orange">⚡</span>
+                        <h3>Retos prácticos</h3>
+                        <p>Aplica lo aprendido con desafíos que fortalecen tu lógica y tus habilidades técnicas.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="feature-icon dark">📈</span>
+                        <h3>Seguimiento real</h3>
+                        <p>Visualiza tu progreso, completa rutas y mantén una evolución constante en tu formación.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section highlight-section">
+            <div class="container highlight-grid">
+                <div class="highlight-copy">
+                    <span class="eyebrow orange">RUTAS DESTACADAS</span>
+                    <h2>Aprende tecnologías con alta demanda</h2>
+                    <p>Comienza con fundamentos y avanza hacia proyectos y ejercicios que te acerquen a escenarios reales.</p>
+                </div>
+
+                <div class="language-grid">
+                    <article class="language-card python">
+                        <strong>Python</strong>
+                        <span>Automatización, lógica y desarrollo backend.</span>
+                    </article>
+                    <article class="language-card java">
+                        <strong>Java</strong>
+                        <span>POO, aplicaciones robustas y bases sólidas.</span>
+                    </article>
+                    <article class="language-card javascript">
+                        <strong>JavaScript</strong>
+                        <span>Interactividad web y experiencias dinámicas.</span>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section stats-band">
+            <div class="container stats-grid">
+                <article class="stat-box">
+                    <strong>+{{ total_usuarios }}</strong>
+                    <span>estudiantes potenciando sus habilidades</span>
+                </article>
+                <article class="stat-box">
+                    <strong>+{{ total_cursos }}</strong>
+                    <span>cursos listos para aprender</span>
+                </article>
+                <article class="stat-box">
+                    <strong>+{{ total_desafios }}</strong>
+                    <span>desafíos para practicar</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section cta-section">
+            <div class="container cta-panel">
+                <div>
+                    <span class="eyebrow blue">COMIENZA HOY</span>
+                    <h2>Da el siguiente paso en tu camino como programador</h2>
+                    <p>Crea tu cuenta y empieza a aprender con cursos guiados, retos y progreso visible.</p>
+                </div>
+                <div class="cta-panel-actions">
+                    <a href="{% url 'core:register' %}" class="solid-btn large">Crear cuenta</a>
+                    <a href="{% url 'core:login' %}" class="outline-btn large dark-outline">Ingresar</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="{% static 'images/logo.png' %}" alt="Slycipher Logo">
+                <div>
+                    <strong>SLYCIPHER</strong>
+                    <span>Plataforma de aprendizaje para futuros desarrolladores.</span>
+                </div>
+            </div>
+            <p>© 2026 Slycipher. Aprende programación con práctica real.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,306 @@
+/* Forzar estilo de botones de acción en caso de cache o reglas externas */
+.action-stack a.icon-btn, .action-stack button.icon-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  background: transparent !important;
+  border: 2px solid transparent !important;
+  min-width: 110px !important;
+  justify-content: center !important;
+}
+
+.action-stack a.icon-btn span {
+  text-decoration: none !important;
+}
+
+.action-stack a.icon-btn,
+.action-stack button.icon-btn {
+  text-decoration: none !important;
+}
+
+/* Forzar variantes de color exactas */
+.action-stack a.icon-btn.reject,
+.action-stack button.icon-btn.reject {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+}
+
+.action-stack a.icon-btn.approve,
+.action-stack button.icon-btn.approve {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-color: #16a34a !important;
+}
+
+.action-stack a.icon-btn.view,
+.action-stack button.icon-btn.view {
+  background: #ffffff !important;
+  color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.action-stack a.icon-btn.edit,
+.action-stack button.icon-btn.edit {
+  background: #ffffff !important;
+  color: #f59e0b !important;
+  border-color: #f59e0b !important;
+}
+
+.action-stack a.icon-btn.delete,
+.action-stack button.icon-btn.delete {
+  background: #ffffff !important;
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+/* evitar subrayado en enlaces dentro del stack */
+.action-stack a.icon-btn {
+  text-decoration: none !important;
+}
+
+/* pequeños ajustes específicos de la página */
+.filters {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.courses-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.courses-table th,
+.courses-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.courses-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.courses-table th:last-child,
+.courses-table td:last-child {
+  text-align: left !important;
+}
+
+.courses-table tbody tr:nth-child(even) {
+  background: #f3f4f6;
+}
+
+.courses-table td {
+  vertical-align: top;
+}
+
+.courses-table td:nth-child(1),
+.courses-table td:nth-child(3),
+.courses-table td:nth-child(4),
+.courses-table td:nth-child(6),
+.courses-table td:nth-child(8) {
+  text-align: center;
+}
+
+.courses-table th:nth-child(1),
+.courses-table td:nth-child(1) {
+  width: 4%;
+}
+
+.courses-table th:nth-child(2),
+.courses-table td:nth-child(2) {
+  width: 20%;
+}
+
+.courses-table th:nth-child(3),
+.courses-table td:nth-child(3) {
+  width: 12%;
+}
+
+.courses-table th:nth-child(4),
+.courses-table td:nth-child(4) {
+  width: 8%;
+}
+
+.courses-table th:nth-child(5),
+.courses-table td:nth-child(5) {
+  width: 10%;
+}
+
+.courses-table th:nth-child(6),
+.courses-table td:nth-child(6) {
+  width: 9%;
+  padding-right: 10px;
+}
+
+.courses-table th:nth-child(7),
+.courses-table td:nth-child(7) {
+  width: 18%;
+  padding-left: 8px;
+  padding-right: 34px;
+}
+
+.courses-table th:nth-child(8),
+.courses-table td:nth-child(8) {
+  width: 20%;
+  padding-left: 0 !important;
+  padding-right: 8px;
+}
+
+.action-buttons .btn {
+  margin-right: 6px;
+}
+
+.courses-table td.action-buttons {
+  text-align: left;
+  vertical-align: top;
+  padding-left: 0 !important;
+}
+
+.courses-table td:nth-child(7) {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.courses-table .action-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 0 !important;
+}
+
+.courses-table .action-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  width: 154px !important;
+  min-width: 154px !important;
+  max-width: 154px !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+}
+
+.courses-table .action-stack .inline-form {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+.courses-table .action-stack .inline-form.inline-form-half {
+  width: 100%;
+}
+
+.courses-table .action-stack .action-top-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.courses-table .action-stack .action-top-row .icon-btn {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  padding: 8px 10px !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+}
+
+.courses-table .action-stack a.icon-btn,
+.courses-table .action-stack button.icon-btn {
+  width: 154px !important;
+  min-width: 154px !important;
+  max-width: 154px !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  box-sizing: border-box;
+}
+
+.courses-table .action-stack .action-top-row .icon-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+}
+
+.courses-table .action-stack .icon-btn span {
+  white-space: nowrap !important;
+}
+
+.courses-table .action-stack .icon-btn.approve {
+  background: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+.courses-table .action-stack .icon-btn.reject {
+  background: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+}
+
+.stat-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+}
+
+.visibility-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.visibility-pill {
+  border: 1px solid transparent;
+}
+
+button.visibility-pill:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.visibility-pill svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.visibility-pill.visible {
+  background: #198754;
+  color: #fff;
+}
+
+.visibility-pill.hidden {
+  background: #6c757d;
+  color: #fff;
+}

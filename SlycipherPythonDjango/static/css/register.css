@@ -1,0 +1,42 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#b6ccf0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.login-container { background:white; border-radius:24px; padding:3rem 2.5rem; box-shadow:0 20px 60px rgba(0,0,0,0.3); width:100%; max-width:420px; }
+.logo { width:70px; height:70px; border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; overflow:hidden; }
+.logo img { height:105%; object-fit:cover; }
+.tabs { display:flex; gap:1rem; margin-bottom:2rem; }
+.tab { flex:1; padding:.75rem; text-align:center; border-radius:12px; font-weight:600; cursor:pointer; text-decoration:none; transition:all .2s; }
+.tab-active { background:#fbbf24; color:#1f2937; }
+.tab-inactive { background:transparent; color:#6b7280; }
+.social-buttons { display:flex; flex-direction:column; gap:.75rem; margin-bottom:1.5rem; }
+.social-btn { padding:.875rem; border:none; border-radius:12px; font-weight:600; font-size:.9375rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; transition:all .2s; text-decoration:none; }
+.btn-github { background:#24292e; color:white; }
+.btn-google { background:#fef3c7; color:#92400e; }
+.btn-microsoft { background:#0078d4; color:white; }
+.social-btn.btn-microsoft { background:#0078d4 !important; color:#fff !important; text-decoration:none !important; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-label { display:block; font-weight:500; color:#6b7280; font-size:.875rem; margin-bottom:.5rem; }
+.form-control { width:100%; padding:.875rem 1rem; border:1px solid #e5e7eb; border-radius:12px; font-size:.9375rem; transition:all .2s; margin-bottom:1rem; }
+.select { appearance:none; }
+.btn-submit { width:100%; padding:.875rem; background:#10b981; color:white; border:none; border-radius:12px; font-weight:600; font-size:1rem; cursor:pointer; transition:all .2s; margin-top:0.5rem; }
+.btn-submit[disabled] { background:#e5e7eb; color:#9ca3af; cursor:not-allowed; }
+.password-hints { margin-top:.5rem; color:#ef4444; font-size:.875rem; }
+.password-hints li { list-style: none; margin:6px 0; }
+.password-hints li.ok { color:#059669; }
+.password-hints li.bad { color:#ef4444; }
+.password-hints li::before{content:"✖"; display:inline-block; width:20px; color:#ef4444; margin-right:6px}
+.password-hints li.ok::before{content:"✔"; color:#059669}
+
+.field-error{color:#dc2626;font-size:.85rem;margin-top:6px}
+
+/* password wrapper and toggle */
+.password-wrapper{position:relative}
+.password-wrapper .form-control{padding-right:58px}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#fff;border-radius:999px;cursor:pointer;padding:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#6b7280;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.password-toggle svg.eye-icon{width:18px;height:18px;color:#6b7280;opacity:0.65;transition:transform .12s ease, opacity .12s ease}
+.password-toggle.visible svg.eye-icon{opacity:1;transform:scale(1.06)}
+.password-toggle svg.eye-icon .eye-slash{opacity:0;transition:opacity .12s ease, transform .12s ease}
+.password-toggle.visible svg.eye-icon .eye-slash{opacity:1}
+.password-toggle.visible svg.eye-icon .eye-open{opacity:0.9}
+.password-toggle:focus{outline:2px solid rgba(59,130,246,0.12)}
+.register-link { text-align:center; font-size:.875rem; color:#6b7280; margin-top:1rem; }
+.register-link a { color:#f97316; text-decoration:none; font-weight:600; }

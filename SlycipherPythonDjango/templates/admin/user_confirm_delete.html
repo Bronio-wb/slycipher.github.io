@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Eliminar Usuario - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_user_form.css' %}">
+  <style>
+    .danger-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 36px 40px;
+      max-width: 520px;
+      margin: 0 auto;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .danger-icon {
+      width: 64px;
+      height: 64px;
+      background: #fee2e2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+    }
+    .danger-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+    .danger-subtitle {
+      color: #6b7280;
+      font-size: 0.97rem;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .user-info-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .user-info-box .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.92rem;
+      color: #374151;
+    }
+    .user-info-box .info-row span:first-child {
+      color: #9ca3af;
+      font-weight: 500;
+    }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s;
+    }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-cancel-plain {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s;
+    }
+    .btn-cancel-plain:hover { background: #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin
+      <span class="pill">Panel de Administración</span>
+    </div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}" class="active">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <div class="header-row">
+        <h1 class="page-title">Eliminar Usuario</h1>
+        <a href="{% url 'core:users' %}" class="btn btn-cancel">← Volver</a>
+      </div>
+
+      <div class="danger-card">
+        <div class="danger-icon">🗑️</div>
+        <div class="danger-title">¿Eliminar este usuario?</div>
+        <div class="danger-subtitle">
+          Esta acción es permanente y no se puede deshacer.<br>
+          El usuario será eliminado del sistema y de la base de datos legada.
+        </div>
+
+        <div class="user-info-box">
+          <div class="info-row">
+            <span>Usuario</span>
+            <span><strong>{{ user_obj.username }}</strong></span>
+          </div>
+          <div class="info-row">
+            <span>Nombre</span>
+            <span>{{ user_obj.first_name }} {{ user_obj.last_name }}</span>
+          </div>
+          <div class="info-row">
+            <span>Correo</span>
+            <span>{{ user_obj.email }}</span>
+          </div>
+          <div class="info-row">
+            <span>Rol</span>
+            <span>
+              {% if user_obj.is_superuser %}Admin
+              {% elif user_obj.is_staff %}Desarrollador
+              {% else %}Estudiante{% endif %}
+            </span>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="action-row">
+            <a href="{% url 'core:users' %}" class="btn-cancel-plain">Cancelar</a>
+            <button type="submit" class="btn-danger">Sí, eliminar</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

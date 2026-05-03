@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Certificaciones - SLYCIPHER Admin</title>
+  <link rel="stylesheet" href="{% static 'css/admin_certifications.css' %}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="logo">&nbsp;SLYCIPHER Admin <span class="pill">Panel de Administración</span></div>
+    <div class="logout">Bienvenido, {{ request.user.username }} &nbsp; <a href="/logout/">Cerrar Sesión</a></div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+      <a href="{% url 'core:users' %}">Usuarios</a>
+      <a href="{% url 'core:admin_courses' %}">Cursos</a>
+      <a href="{% url 'core:admin_data_load' %}">Carga Masiva</a>
+      <a href="{% url 'core:admin_statistics' %}">Estadísticas</a>
+      <a href="{% url 'core:admin_reports' %}">Reportes</a>
+      <a href="{% url 'core:admin_certifications' %}" class="active">Certificaciones</a>
+      <a href="{% url 'core:profile' %}">Mi Perfil</a>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">GESTIÓN ACADÉMICA</span>
+          <h1>Panel de Certificaciones</h1>
+          <p>Administra estudiantes elegibles, certificados emitidos y cursos con avance suficiente para acreditación.</p>
+        </div>
+        <div class="hero-card">
+          <span class="hero-label">Validación pública</span>
+          <strong>Certificados con código único</strong>
+          <p>Cada PDF incluye un código y URL para validar su autenticidad.</p>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Elegibles</span>
+          <strong>{{ eligible_students_count }}</strong>
+          <p>Estudiantes listos para certificar</p>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Emitidos</span>
+          <strong>{{ certificates_total }}</strong>
+          <p>Total de certificados registrados</p>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Generales</span>
+          <strong>{{ general_certificates_total }}</strong>
+          <p>Certificados globales emitidos</p>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Por Curso</span>
+          <strong>{{ course_certificates_total }}</strong>
+          <p>Certificados individuales por curso</p>
+        </article>
+      </section>
+
+      <section class="filter-panel">
+        <form method="get" class="filter-form">
+          <div class="filter-field">
+            <label for="studentFilter">Filtrar por estudiante</label>
+            <input id="studentFilter" type="text" name="student" value="{{ student_filter }}" placeholder="Nombre, usuario o correo">
+          </div>
+          <div class="filter-field">
+            <label for="courseFilter">Filtrar por curso</label>
+            <input id="courseFilter" type="text" name="course" value="{{ course_filter }}" placeholder="Título del curso o creador">
+          </div>
+          <div class="filter-field">
+            <label for="certificateSearch">Buscar certificado emitido</label>
+            <input id="certificateSearch" type="text" name="certificate" value="{{ certificate_search }}" placeholder="Código, estudiante o curso">
+          </div>
+          <div class="filter-actions">
+            <button type="submit" class="action-link">Aplicar filtros</button>
+            <a href="{% url 'core:admin_certifications' %}" class="action-link secondary">Limpiar</a>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <span class="panel-kicker">Seguimiento</span>
+            <h2>Cursos con Estudiantes Inscritos</h2>
+          </div>
+          <span class="panel-meta">{{ courses_with_enrollments_count }} cursos con movimiento</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Curso</th><th>Creador</th><th>Nivel</th><th>Inscritos</th><th>Lecciones</th><th>Desafíos</th></tr></thead>
+            <tbody>
+              {% for curso in top_courses_with_enrollments %}
+              <tr>
+                <td>{{ curso.titulo }}</td>
+                <td>{{ curso.creador }}</td>
+                <td>{{ curso.nivel }}</td>
+                <td><span class="badge blue">{{ curso.inscritos }}</span></td>
+                <td>{{ curso.lecciones }}</td>
+                <td>{{ curso.desafios }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="table-empty">No hay cursos con estudiantes inscritos todavía.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if history_page and history_page.paginator.num_pages > 1 %}
+        <div class="pager">
+          {% if history_page.has_previous %}
+            <a class="pager-link" href="?student={{ student_filter|urlencode }}&course={{ course_filter|urlencode }}&certificate={{ certificate_search|urlencode }}&page={{ history_page.previous_page_number }}">Anterior</a>
+          {% else %}
+            <span class="pager-link disabled">Anterior</span>
+          {% endif %}
+
+          <div class="pager-numbers">
+            {% for page_num in history_compact_range %}
+              {% if page_num == '...' %}
+                <span class="pager-dots">...</span>
+              {% elif page_num == history_page.number %}
+                <span class="pager-link active">{{ page_num }}</span>
+              {% else %}
+                <a class="pager-link" href="?student={{ student_filter|urlencode }}&course={{ course_filter|urlencode }}&certificate={{ certificate_search|urlencode }}&page={{ page_num }}">{{ page_num }}</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <span class="pager-info">Página {{ history_page.number }} de {{ history_page.paginator.num_pages }}</span>
+
+          {% if history_page.has_next %}
+            <a class="pager-link" href="?student={{ student_filter|urlencode }}&course={{ course_filter|urlencode }}&certificate={{ certificate_search|urlencode }}&page={{ history_page.next_page_number }}">Siguiente</a>
+          {% else %}
+            <span class="pager-link disabled">Siguiente</span>
+          {% endif %}
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <span class="panel-kicker">Emisión</span>
+            <h2>Estudiantes Elegibles para Certificación</h2>
+          </div>
+          <span class="panel-meta">Por curso: 1 curso completo | General: mínimo 2 cursos</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Estudiante</th><th>Cursos</th><th>Lecciones</th><th>Desafíos</th><th>Acciones</th></tr></thead>
+            <tbody>
+              {% for estudiante in certificate_candidates %}
+              <tr>
+                <td>
+                  <div class="table-strong">{{ estudiante.nombre }}</div>
+                  <div class="table-subtle">{{ estudiante.email }}</div>
+                  <div class="chip-row">
+                    {% for curso in estudiante.completed_courses|slice:":3" %}
+                      <span class="chip">{{ curso.titulo }}</span>
+                    {% endfor %}
+                    {% if estudiante.completed_courses_count > 3 %}
+                      <span class="chip">+{{ estudiante.completed_courses_count|add:"-3" }} más</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td><span class="badge orange">{{ estudiante.completed_courses_count }}</span></td>
+                <td>{{ estudiante.total_lessons_completed }}</td>
+                <td>{{ estudiante.total_challenges_completed }}</td>
+                <td>
+                  <div class="action-stack">
+                    {% if estudiante.eligible_general %}
+                      <a class="action-link" href="{% url 'core:admin_student_certificate_pdf' estudiante.user_id %}">PDF general</a>
+                    {% else %}
+                      <span class="action-link secondary">General (requiere 2 cursos)</span>
+                    {% endif %}
+                    <div class="mini-links">
+                      {% for curso in estudiante.completed_courses|slice:":2" %}
+                        <a class="action-link secondary" href="{% url 'core:admin_student_course_certificate_pdf' estudiante.user_id curso.course_id %}">{{ curso.titulo }}</a>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="table-empty">Todavía no hay estudiantes con el criterio mínimo para certificar.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <span class="panel-kicker">Trazabilidad</span>
+            <h2>Historial de Certificados Emitidos</h2>
+          </div>
+          <span class="panel-meta">Últimas emisiones registradas</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Estudiante</th><th>Tipo</th><th>Curso</th><th>Emitido por</th><th>Fecha</th><th>Código</th></tr></thead>
+            <tbody>
+              {% for item in certificate_history %}
+              <tr>
+                <td>{{ item.student_name }}</td>
+                <td><span class="badge {% if item.certificate_type == 'General' %}orange{% else %}blue{% endif %}">{{ item.certificate_type }}</span></td>
+                <td>{{ item.course_title }}</td>
+                <td>{{ item.issued_by }}</td>
+                <td>{{ item.issued_at }}</td>
+                <td><span class="chip">{{ item.code }}</span></td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="table-empty">No hay certificados emitidos todavía.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

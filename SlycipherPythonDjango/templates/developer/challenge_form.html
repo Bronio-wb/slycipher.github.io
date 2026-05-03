@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if is_edit %}Editar Desafío{% else %}Crear Desafío{% endif %} - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f9fafb; }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .form-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge" style="background-color: #ff6b35;">{% if is_edit %}Editar Desafío{% else %}Crear Desafío{% endif %}</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}" class="active"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-1">{% if is_edit %}Editar Desafío{% else %}Crear Nuevo Desafío{% endif %}</h2>
+          <p class="text-muted">Completa el formulario para gestionar el desafío</p>
+        </div>
+        <a href="{% url 'core:developer_challenges' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      <div class="form-card">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Curso <span class="text-danger">*</span></label>
+              <select class="form-select" name="course_id" required>
+                <option value="">Selecciona un curso</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.id }}" {% if form_data.course_id == curso.id|stringformat:"s" %}selected{% endif %}>{{ curso.titulo }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Lenguaje de Programación <span class="text-danger">*</span></label>
+              <select class="form-select" name="language_id" required>
+                <option value="">Selecciona un lenguaje</option>
+                {% for lenguaje in lenguajes %}
+                <option value="{{ lenguaje.id }}" {% if form_data.language_id == lenguaje.id|stringformat:"s" %}selected{% endif %}>{{ lenguaje.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Título del Desafío <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="titulo" value="{{ form_data.titulo|default:'' }}" placeholder="Ej: Crear una función que calcule el factorial" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Dificultad <span class="text-danger">*</span></label>
+              <select class="form-select" name="dificultad" required>
+                <option value="">Selecciona</option>
+                <option value="facil" {% if form_data.dificultad == 'facil' %}selected{% endif %}>Fácil</option>
+                <option value="medio" {% if form_data.dificultad == 'medio' %}selected{% endif %}>Medio</option>
+                <option value="dificil" {% if form_data.dificultad == 'dificil' %}selected{% endif %}>Difícil</option>
+              </select>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label class="form-label">Descripción del Desafío <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="descripcion" rows="4" placeholder="Describe el problema que los estudiantes deben resolver..." required>{{ form_data.descripcion|default:'' }}</textarea>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label class="form-label">Solución (Código)</label>
+              <textarea class="form-control" name="solucion" rows="8" placeholder="Escribe aquí la solución del desafío (opcional)" style="font-family: monospace;">{{ form_data.solucion|default:'' }}</textarea>
+              <small class="text-muted">Este código no será visible para los estudiantes</small>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn {% if is_edit %}btn-warning{% else %}btn-success{% endif %}">
+              <i class="bi bi-check-circle"></i> {% if is_edit %}Actualizar Desafío{% else %}Crear Desafío{% endif %}
+            </button>
+            <a href="{% url 'core:developer_challenges' %}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

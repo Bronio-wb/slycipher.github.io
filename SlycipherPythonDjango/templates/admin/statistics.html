@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas del Sistema - SLYCIPHER Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/admin_statistics.css' %}?v=20260413">
+</head>
+<body>
+  <nav class="stats-navbar text-white fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="SLYCIPHER Logo" class="stats-logo">
+          <h1 class="h4 mb-0 fw-bold">SLYCIPHER Admin</h1>
+          <span class="stats-panel-badge">Panel de Administración</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ request.user.username }}</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="stats-layout">
+    <aside class="stats-sidebar">
+      <nav class="mt-3">
+        <a href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+        <a href="{% url 'core:users' %}">Usuarios</a>
+        <a href="{% url 'core:admin_courses' %}">Cursos</a>
+        <a href="{% url 'core:admin_statistics' %}" class="active">Estadísticas</a>
+        <a href="{% url 'core:admin_reports' %}">Reportes</a>
+        <a href="{% url 'core:admin_certifications' %}">Certificaciones</a>
+      </nav>
+    </aside>
+
+    <main class="stats-main">
+      <div class="container-fluid p-4">
+        <!-- Encabezado -->
+        <section class="stats-hero mb-4">
+          <div>
+            <span class="stats-kicker">ANALÍTICA DEL PANEL</span>
+            <h2 class="stats-title mb-2">Estadísticas del Sistema</h2>
+            <p class="stats-subtitle mb-0">Una vista clara del rendimiento de cursos, categorías, lenguajes y crecimiento de usuarios.</p>
+          </div>
+          <div class="stats-hero-actions">
+            <form action="{% url 'core:admin_statistics_pdf' %}" method="get" class="d-flex align-items-center gap-2 flex-wrap">
+              <label for="tipo-pdf" class="visually-hidden">Tipo de PDF</label>
+              <select id="tipo-pdf" name="tipo" class="form-select form-select-sm" style="min-width: 210px;">
+                <option value="general">General</option>
+                <option value="categorias">Categorías</option>
+                <option value="lenguajes">Lenguajes</option>
+                <option value="desafios">Desafíos</option>
+                <option value="usuarios">Usuarios</option>
+                <option value="cursos">Cursos</option>
+              </select>
+              <button type="submit" class="stats-back-button">Descargar PDF</button>
+            </form>
+            <a href="{% url 'core:admin_dashboard' %}" class="stats-back-button">← Volver al Dashboard</a>
+          </div>
+        </section>
+
+        <!-- KPIs Principales -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="stats-card stats-card-primary">
+              <div class="stats-card-body">
+                <div>
+                  <p class="stats-card-label">Total Usuarios</p>
+                  <p class="stats-card-value stats-value-blue">{{ kpis.total_usuarios }}</p>
+                  <p class="stats-card-helper"><strong>{{ kpis.usuarios_activos }}</strong> activos ({{ kpis.tasa_activacion }}%)</p>
+                </div>
+                <div class="stats-card-icon bg-blue-subtle"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="stats-card stats-card-success">
+              <div class="stats-card-body">
+                <div>
+                  <p class="stats-card-label">Total Desafíos</p>
+                  <p class="stats-card-value stats-value-green">{{ kpis.total_desafios }}</p>
+                  <p class="stats-card-helper">{{ kpis.total_submissions }} intentos realizados</p>
+                </div>
+                <div class="stats-card-icon bg-green-subtle"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="stats-card stats-card-warning">
+              <div class="stats-card-body">
+                <div>
+                  <p class="stats-card-label">Tasa de Éxito General</p>
+                  <p class="stats-card-value stats-value-orange">{{ desempeno_desafios.tasa_exito_general }}%</p>
+                  <p class="stats-card-helper">Desafíos resueltos correctamente</p>
+                </div>
+                <div class="stats-card-icon bg-orange-subtle"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="stats-card stats-card-info">
+              <div class="stats-card-body">
+                <div>
+                  <p class="stats-card-label">Total Cursos</p>
+                  <p class="stats-card-value stats-value-blue">{{ total_courses }}</p>
+                  <p class="stats-card-helper">{{ total_categories }} categorías, {{ total_languages }} lenguajes</p>
+                </div>
+                <div class="stats-card-icon bg-indigo-subtle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen de Cobertura -->
+        <div class="stats-overview-grid mb-4">
+          <div class="stats-overview-card">
+            <div class="stats-overview-title">Segmentación de Usuarios</div>
+            <div class="stats-overview-value">{{ segmentacion_usuarios.muy_activos }}</div>
+            <div class="stats-overview-copy">usuarios muy activos (racha > 7 días)</div>
+          </div>
+          <div class="stats-overview-card">
+            <div class="stats-overview-title">Crecimiento</div>
+            <div class="stats-overview-value">{{ registros_del_mes }}</div>
+            <div class="stats-overview-copy">nuevos registros en el mes actual</div>
+          </div>
+          <div class="stats-overview-card">
+            <div class="stats-overview-title">Cobertura</div>
+            <div class="stats-overview-value">{{ total_courses }}</div>
+            <div class="stats-overview-copy">cursos en {{ total_categories }} categorías</div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: ANÁLISIS DE DESAFÍOS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Rendimiento</span>
+                  <h3>Éxito por Dificultad</h3>
+                </div>
+                <span class="stats-panel-chip">{{ desempeno_desafios.tasa_exito_general }}% promedio</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="stats-list">
+                  {% for item in desempeno_desafios.exito_por_dificultad %}
+                    <div class="stats-list-row">
+                      <span class="stats-list-name">
+                        {% if item.dificultad == 'facil' %}
+                          🟢 Fácil
+                        {% elif item.dificultad == 'medio' %}
+                          🟡 Medio
+                        {% else %}
+                          🔴 Difícil
+                        {% endif %}
+                      </span>
+                      <div class="stats-list-details">
+                        <span class="stats-list-badge stats-list-badge-primary">{{ item.exitosos }}/{{ item.total }}</span>
+                        <span class="stats-list-percentage" style="color: {% if item.tasa >= 70 %}#10b981{% elif item.tasa >= 50 %}#f59e0b{% else %}#ef4444{% endif %}">{{ item.tasa }}%</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Distribución</span>
+                  <h3>Cursos por Nivel</h3>
+                </div>
+                <span class="stats-panel-chip">{{ total_courses }} cursos</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="chart-shell chart-shell-doughnut">
+                  <canvas id="nivelChart"></canvas>
+                </div>
+                <div class="stats-list mt-4">
+                  {% for item in distribucion_por_nivel %}
+                    <div class="stats-list-row">
+                      <span class="stats-list-name">{{ item.nivel }}</span>
+                      <span class="stats-list-badge stats-list-badge-info">{{ item.cantidad }} cursos</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: TOP USUARIOS Y CURSOS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Actividad</span>
+                  <h3>🏆 Top Usuarios</h3>
+                </div>
+                <span class="stats-panel-chip">Top 8</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="stats-list">
+                  {% for usuario in usuarios_activos_top %}
+                    <div class="stats-list-row">
+                      <div>
+                        <span class="stats-list-name">{{ usuario.nombre }}</span>
+                        <span class="stats-list-subtext">{{ usuario.email }}</span>
+                      </div>
+                      <div class="stats-user-metrics">
+                        <span class="stats-metric-badge">{{ usuario.desafios_completados }} desafíos</span>
+                        <span class="stats-metric-badge">{{ usuario.logros }} logros</span>
+                        {% if usuario.racha > 0 %}
+                          <span class="stats-metric-badge stats-metric-racha">{{ usuario.racha }} 🔥</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Popularidad</span>
+                  <h3>⭐ Cursos Más Populares</h3>
+                </div>
+                <span class="stats-panel-chip">Top 8</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="stats-list">
+                  {% for curso in cursos_populares %}
+                    <div class="stats-list-row">
+                      <div>
+                        <span class="stats-list-name">{{ curso.titulo }}</span>
+                        <span class="stats-list-subtext">{{ curso.nivel|upper }}</span>
+                      </div>
+                      <div class="stats-course-metrics">
+                        <span class="stats-metric-badge">{{ curso.desafios }} desafíos</span>
+                        <span class="stats-metric-badge stats-metric-primary">{{ curso.participaciones }} participaciones</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: LOGROS Y TENDENCIAS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Gamificación</span>
+                  <h3>🎖️ Logros Más Desbloqueados</h3>
+                </div>
+                <span class="stats-panel-chip">Top 6</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="stats-list">
+                  {% for logro in logros_mas_desbloqueados %}
+                    <div class="stats-list-row">
+                      <span class="stats-list-name">{{ logro.nombre }}</span>
+                      <span class="stats-list-badge stats-list-badge-success">{{ logro.usuarios_desbloqueados }} usuarios</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Segmentación</span>
+                  <h3>👥 Estado de Usuarios</h3>
+                </div>
+                <span class="stats-panel-chip">{{ segmentacion_usuarios.total }} total</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="chart-shell chart-shell-doughnut">
+                  <canvas id="segmentacionChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: DISTRIBUCIONES DETALLADAS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Distribución</span>
+                  <h3>Cursos por Categoría</h3>
+                </div>
+                <span class="stats-panel-chip">{{ total_categories }} categorías</span>
+              </div>
+              <div class="stats-panel-body">
+                {% if courses_by_category %}
+                  <div class="chart-shell chart-shell-bar">
+                    <canvas id="categoryChart"></canvas>
+                  </div>
+                  <div class="stats-list mt-4">
+                    {% for label, value in courses_by_category %}
+                      <div class="stats-list-row">
+                        <span class="stats-list-name">{{ label }}</span>
+                        <span class="stats-list-badge stats-list-badge-primary">{{ value }} cursos</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="stats-empty"><p>No hay datos disponibles</p></div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Tecnologías</span>
+                  <h3>💻 Cursos por Lenguaje</h3>
+                </div>
+                <span class="stats-panel-chip">{{ total_languages }} lenguajes</span>
+              </div>
+              <div class="stats-panel-body">
+                {% if courses_by_language %}
+                  <div class="chart-shell chart-shell-doughnut">
+                    <canvas id="languageChart"></canvas>
+                  </div>
+                  <div class="stats-list mt-4">
+                    {% for label, value in courses_by_language %}
+                      <div class="stats-list-row">
+                        <span class="stats-list-name">{{ label }}</span>
+                        <span class="stats-list-badge stats-list-badge-success">{{ value }} cursos</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="stats-empty"><p>No hay datos disponibles</p></div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: ANÁLISIS PROFUNDO POR CATEGORÍA -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Análisis Detallado</span>
+                  <h3>📊 Desempeño por Categoría</h3>
+                </div>
+                <span class="stats-panel-chip">{{ total_categories }} categorías</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="table-responsive">
+                  <table class="stats-table">
+                    <thead>
+                      <tr>
+                        <th>Categoría</th>
+                        <th>Cursos</th>
+                        <th>Desafíos</th>
+                        <th>Intentos</th>
+                        <th>Exitosos</th>
+                        <th>Tasa de Éxito</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for cat in analisis_categorias %}
+                        <tr>
+                          <td><strong>{{ cat.nombre }}</strong></td>
+                          <td>{{ cat.cursos }}</td>
+                          <td>{{ cat.desafios }}</td>
+                          <td>{{ cat.intentos }}</td>
+                          <td>{{ cat.exitosos }}</td>
+                          <td>
+                            <span class="stats-tasa-badge" style="background-color: {% if cat.tasa_exito >= 70 %}#d1fae5{% elif cat.tasa_exito >= 50 %}#fef3c7{% else %}#fee2e2{% endif %}; color: {% if cat.tasa_exito >= 70 %}#065f46{% elif cat.tasa_exito >= 50 %}#92400e{% else %}#7f1d1d{% endif %}">
+                              {{ cat.tasa_exito }}%
+                            </span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 6: ANÁLISIS POR LENGUAJE -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Análisis Detallado</span>
+                  <h3>🔧 Desempeño por Lenguaje</h3>
+                </div>
+                <span class="stats-panel-chip">{{ total_languages }} lenguajes</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="table-responsive">
+                  <table class="stats-table">
+                    <thead>
+                      <tr>
+                        <th>Lenguaje</th>
+                        <th>Cursos</th>
+                        <th>Desafíos</th>
+                        <th>Intentos</th>
+                        <th>Exitosos</th>
+                        <th>Tasa de Éxito</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for lng in analisis_lenguajes %}
+                        <tr>
+                          <td><strong>{{ lng.nombre }}</strong></td>
+                          <td>{{ lng.cursos }}</td>
+                          <td>{{ lng.desafios }}</td>
+                          <td>{{ lng.intentos }}</td>
+                          <td>{{ lng.exitosos }}</td>
+                          <td>
+                            <span class="stats-tasa-badge" style="background-color: {% if lng.tasa_exito >= 70 %}#d1fae5{% elif lng.tasa_exito >= 50 %}#fef3c7{% else %}#fee2e2{% endif %}; color: {% if lng.tasa_exito >= 70 %}#065f46{% elif lng.tasa_exito >= 50 %}#92400e{% else %}#7f1d1d{% endif %}">
+                              {{ lng.tasa_exito }}%
+                            </span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 7: DESAFÍOS MÁS COMPLETADOS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Popularidad</span>
+                  <h3>🎯 Desafíos Más Completados</h3>
+                </div>
+                <span class="stats-panel-chip">Top 10</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="table-responsive">
+                  <table class="stats-table">
+                    <thead>
+                      <tr>
+                        <th>Desafío</th>
+                        <th>Dificultad</th>
+                        <th>Completados</th>
+                        <th>Total Intentos</th>
+                        <th>Tasa de Éxito</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for des in desempeno_desafios.desafios_mas_completados %}
+                        <tr>
+                          <td><strong>{{ des.titulo }}</strong></td>
+                          <td>
+                            {% if des.dificultad == 'facil' %}
+                              <span class="badge bg-success">Fácil</span>
+                            {% elif des.dificultad == 'medio' %}
+                              <span class="badge bg-warning">Medio</span>
+                            {% else %}
+                              <span class="badge bg-danger">Difícil</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ des.completados }}</td>
+                          <td>{{ des.intentos }}</td>
+                          <td>
+                            <span class="stats-tasa-badge" style="background-color: {% if des.tasa_exito >= 70 %}#d1fae5{% elif des.tasa_exito >= 50 %}#fef3c7{% else %}#fee2e2{% endif %}; color: {% if des.tasa_exito >= 70 %}#065f46{% elif des.tasa_exito >= 50 %}#92400e{% else %}#7f1d1d{% endif %}">
+                              {{ des.tasa_exito }}%
+                            </span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 8: TENDENCIA DE CRECIMIENTO -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Crecimiento</span>
+                  <h3>📈 Registros de Usuarios por Mes</h3>
+                </div>
+                <span class="stats-panel-chip">{{ registros_del_mes }} este mes</span>
+              </div>
+              <div class="stats-panel-body">
+                {% if users_by_month %}
+                  <div class="chart-shell chart-shell-line chart-shell-wide">
+                    <canvas id="usersChart"></canvas>
+                  </div>
+                  <div class="stats-list mt-4">
+                    {% for label, value in users_by_month %}
+                      <div class="stats-list-row">
+                        <span class="stats-list-name">{{ label }}</span>
+                        <span class="stats-list-badge stats-list-badge-purple">{{ value }} usuarios</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="stats-empty"><p>No hay datos disponibles</p></div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 9: TENDENCIA 30 DÍAS -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="stats-panel">
+              <div class="stats-panel-header">
+                <div>
+                  <span class="stats-panel-eyebrow">Tendencia Reciente</span>
+                  <h3>📊 Registros de Últimos 30 Días</h3>
+                </div>
+                <span class="stats-panel-chip">Últimos 30 días</span>
+              </div>
+              <div class="stats-panel-body">
+                <div class="chart-shell chart-shell-line chart-shell-wide">
+                  <canvas id="tendenciaChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- JSON Scripts para gráficos -->
+  {{ courses_by_category_labels|json_script:"stats-category-labels" }}
+  {{ courses_by_category_values|json_script:"stats-category-values" }}
+  {{ courses_by_language_labels|json_script:"stats-language-labels" }}
+  {{ courses_by_language_values|json_script:"stats-language-values" }}
+  {{ users_by_month_labels|json_script:"stats-users-labels" }}
+  {{ users_by_month_values|json_script:"stats-users-values" }}
+  {{ distribucion_por_nivel|json_script:"stats-nivel-data" }}
+  {{ tendencia_usuarios|json_script:"stats-tendencia-data" }}
+  
+  <!-- Data para segmentación -->
+  <script id="stats-segmentacion-data" type="application/json">
+    {
+      "labels": ["Muy Activos", "Activos Recientes", "Con Participación", "Inactivos"],
+      "values": [{{ segmentacion_usuarios.muy_activos }}, {{ segmentacion_usuarios.activos_recientes }}, {{ segmentacion_usuarios.con_participacion }}, {{ segmentacion_usuarios.inactivos }}]
+    }
+  </script>
+
+  <!-- Data para nivel de cursos -->
+  <script id="stats-nivel-labels" type="application/json">
+    {% for item in distribucion_por_nivel %}{{ item.nivel }}{% if not forloop.last %},{% endif %}{% endfor %}
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'js/admin_statistics.js' %}?v=20260413"></script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if is_edit %}Editar Lección{% else %}Crear Lección{% endif %} - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <style>
+    body { background-color: #f5f5f5; }
+    .CodeMirror {
+      height: 220px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+    }
+    .code-editor-wrapper {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .code-editor-info {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 4px;
+    }
+    .code-run-output {
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 8px;
+      min-height: 120px;
+      padding: 12px;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      border: 1px solid #1f2937;
+    }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .form-card { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge" style="background-color: #ff6b35;">{% if is_edit %}Editar Lección{% else %}Crear Lección{% endif %}</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}" class="active"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>{% if is_edit %}Editar Lección{% else %}Crear Nueva Lección{% endif %}</h2>
+          <p class="text-muted">Curso: <strong>{{ curso.titulo }}</strong></p>
+        </div>
+        <div>
+          <a href="{% url 'core:developer_course_lessons' curso.id %}" class="btn btn-secondary me-2"><i class="bi bi-arrow-left"></i> Volver</a>
+          <a href="{% url 'core:developer_course_view' curso.id %}" class="btn btn-info"><i class="bi bi-eye"></i> Ver Curso</a>
+        </div>
+      </div>
+
+      {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ error }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
+
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <div class="form-card">
+            <form method="post">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Título de la Lección *</label>
+                <input type="text" class="form-control" name="titulo" required value="{{ form_data.titulo|default:'' }}" placeholder="Ej: Introducción a Variables">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Orden *</label>
+                <input type="number" class="form-control" name="orden" required min="1" value="{{ form_data.orden|default:'1' }}">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Contenido de la Lección *</label>
+                <textarea class="form-control" name="contenido" rows="8" required placeholder="Escribe el contenido de tu lección aquí...">{{ form_data.contenido|default:'' }}</textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Código de Ejemplo (Opcional)</label>
+                <p class="code-editor-info"><i class="bi bi-info-circle"></i> Este código se mostrará como referencia para los estudiantes</p>
+                <div class="code-editor-wrapper">
+                  <div id="code-editor"></div>
+                </div>
+                <textarea id="codigo_ejemplo_hidden" name="codigo_ejemplo" style="display:none;">{{ form_data.codigo_ejemplo|default:'' }}</textarea>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="run-code-btn">
+                    <i class="bi bi-play-fill"></i> Ejecutar código
+                  </button>
+                  <small class="text-muted">Prueba rápida del ejemplo antes de guardar la lección.</small>
+                </div>
+                <div id="code-run-output" class="code-run-output">Salida de ejecución...</div>
+              </div>
+
+              <div class="mb-4">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="visible" name="visible" value="true" {% if form_data.visible %}checked{% endif %}>
+                  <label class="form-check-label" for="visible">Lección activa (visible para estudiantes)</label>
+                </div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <a href="{% url 'core:developer_course_lessons' curso.id %}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancelar</a>
+                <button type="submit" class="btn btn-success">
+                  {% if is_edit %}
+                    <i class="bi bi-check-circle"></i> Guardar Cambios
+                  {% else %}
+                    <i class="bi bi-plus-circle"></i> Crear Lección
+                  {% endif %}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script>
+    const lenguaje = "{{ curso.lenguaje|default:'python'|lower|escapejs }}";
+    const mode = lenguaje.includes('java') ? 'text/x-java' : (lenguaje.includes('javascript') ? 'javascript' : 'python');
+    const hiddenTA = document.getElementById('codigo_ejemplo_hidden');
+    const editor = CodeMirror(document.getElementById('code-editor'), {
+      value: hiddenTA.value,
+      mode,
+      theme: 'dracula',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      indentWithTabs: false,
+      lineWrapping: true,
+      autofocus: false,
+      placeholder: '# Escribe el código de ejemplo aquí...'
+    });
+    document.querySelector('form').addEventListener('submit', function() {
+      hiddenTA.value = editor.getValue();
+    });
+
+    const runBtn = document.getElementById('run-code-btn');
+    const runOutput = document.getElementById('code-run-output');
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    runBtn.addEventListener('click', async function () {
+      hiddenTA.value = editor.getValue();
+      const code = hiddenTA.value;
+
+      if (!code.trim()) {
+        runOutput.textContent = 'Escribe código antes de ejecutar.';
+        return;
+      }
+
+      runBtn.disabled = true;
+      runOutput.textContent = 'Ejecutando...';
+
+      try {
+        const response = await fetch("{% url 'core:developer_lesson_code_execute' curso.id %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({
+            language: lenguaje || 'python',
+            code,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          const stdout = (data.salida || '').trim();
+          const stderr = (data.error || '').trim();
+          runOutput.textContent = stdout || stderr || '(Sin salida)';
+        } else {
+          runOutput.textContent = data.error || 'No se pudo ejecutar el código.';
+        }
+      } catch (err) {
+        runOutput.textContent = 'Error de conexión al ejecutar el código.';
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

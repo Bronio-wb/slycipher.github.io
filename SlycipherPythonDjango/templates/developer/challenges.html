@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Desafíos - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f9fafb; }
+    .navbar-custom { background-color: #2c3a51; }
+    .sidebar { min-height: 100vh; background-color: white; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 250px; padding-top: 60px; }
+    .sidebar a { color: #333; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 4px 10px; }
+    .sidebar a:hover { background-color: #f3f4f6; }
+    .sidebar a.active { background-color: #ffe5d9; color: #ff6b35; font-weight: 600; }
+    .main-content { margin-left: 250px; padding-top: 70px; }
+    .desafio-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; transition: all 0.3s; }
+    .desafio-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .difficulty-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .difficulty-facil { background-color: #d1fae5; color: #065f46; }
+    .difficulty-medio { background-color: #fef3c7; color: #92400e; }
+    .difficulty-dificil { background-color: #fee2e2; color: #991b1b; }
+    .empty-state { text-align: center; padding: 80px 20px; color: #6b7280; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-card h3 { font-size: 2rem; font-weight: 700; margin: 0; }
+    .stat-card p { color: #6b7280; margin: 0; font-size: 0.875rem; }
+    .stat-card small { font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 35px;">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge" style="background-color: #ff6b35;">Mis Desafíos</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-fire"></i> {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_challenges' %}" class="active"><i class="bi bi-trophy"></i> Mis Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestión de Desafíos</h2>
+        <div class="d-flex gap-2">
+          <a href="{% url 'core:developer_challenge_create' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nuevo Desafío</a>
+          <a href="{% url 'core:developer_dashboard' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-1">Total Cursos</p>
+                <h3 class="text-primary">{{ cursos|length }}</h3>
+              </div>
+              <div style="width: 60px; height: 60px; background: #e0f2fe; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-book" style="font-size: 2rem; color: #0284c7;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-1">Total Desafíos</p>
+                <h3 class="text-success">{{ total_desafios }}</h3>
+              </div>
+              <div style="width: 60px; height: 60px; background: #dcfce7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-trophy" style="font-size: 2rem; color: #16a34a;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-1">Dificultad Medio</p>
+                <h3 class="text-warning">{{ total_medio }}</h3>
+                <small class="text-muted">Desafíos</small>
+              </div>
+              <div style="width: 60px; height: 60px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-hourglass-split" style="font-size: 2rem; color: #f59e0b;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-1">Difícil + Fácil</p>
+                <h3 class="text-info">{{ total_dificil|add:total_facil }}</h3>
+                <small class="text-muted">Desafíos</small>
+              </div>
+              <div style="width: 60px; height: 60px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-circle" style="font-size: 2rem; color: #3b82f6;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <h4 class="mb-3">Mis Cursos (Disponibles para Desafíos)</h4>
+
+      {% if cursos %}
+        {% for curso in cursos %}
+        <div class="mb-3">
+          <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <h5 class="mb-0">{{ curso.titulo }}</h5>
+                    <span class="badge bg-success">Activo</span>
+                  </div>
+                  <p class="text-muted mb-2">{{ curso.descripcion|default:'Sin descripción' }}</p>
+                  <div class="d-flex gap-3 small">
+                    <span><strong>{{ curso.categoria|default:'Programación General' }}</strong></span>
+                    <span class="text-primary">{{ curso.nivel|default:'N/A' }}</span>
+                    <span class="badge" style="background-color: #e0f2fe; color: #0284c7;">{{ curso.lenguaje|default:'N/A' }}</span>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <a href="{% url 'core:developer_challenge_create' %}?cursoId={{ curso.id }}" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i> Desafío</a>
+                  <a href="{% url 'core:developer_course_view' curso.id %}" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver curso</a>
+                </div>
+              </div>
+
+                {% if curso.desafios %}
+                <div class="mt-3 pt-3" style="border-top: 1px solid #e5e7eb;">
+                  {% for desafio in curso.desafios %}
+                  <div class="desafio-card mb-2" style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2">
+                          <img src="{% static 'images/logo_desafios.png' %}" alt="Logo" style="height: 30px; width: 30px; object-fit: contain;">
+                          <span class="fw-medium">{{ desafio.titulo }}</span>
+                          {% with diff=desafio.dificultad|lower %}
+                            {% if diff == 'fácil' %}
+                              <span class="difficulty-badge difficulty-facil">{{ desafio.dificultad }}</span>
+                            {% elif diff == 'difícil' %}
+                              <span class="difficulty-badge difficulty-dificil">{{ desafio.dificultad }}</span>
+                            {% else %}
+                              <span class="difficulty-badge difficulty-medio">{{ desafio.dificultad }}</span>
+                            {% endif %}
+                          {% endwith %}
+                        </div>
+                      </div>
+                      <div class="d-flex gap-1">
+                        <a href="{% url 'core:developer_challenge_view' desafio.id %}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'core:developer_challenge_edit' desafio.id %}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                        <form action="{% url 'core:developer_challenge_delete' desafio.id %}" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este desafío?');">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-book" style="font-size: 4rem; color: #d1d5db;"></i>
+        <h3 class="mt-3">No tienes cursos creados</h3>
+        <p class="mb-4">Primero debes crear un curso para poder agregar desafíos</p>
+        <a href="{% url 'core:developer_course_create' %}" class="btn btn-success btn-lg"><i class="bi bi-plus-circle"></i> Crear Mi Primer Curso</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

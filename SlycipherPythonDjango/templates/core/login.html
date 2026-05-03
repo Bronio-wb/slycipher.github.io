@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Slycipher</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <img src="{% static 'images/logo.png' %}" alt="Slycipher Logo" onerror="this.style.display='none'">
+    </div>
+
+    <div class="tabs">
+      <a href="{% url 'core:login' %}" class="tab tab-active">Iniciar sesión</a>
+      <a href="{% url 'core:register' %}" class="tab tab-inactive">Registrarse</a>
+    </div>
+
+    <div class="social-buttons">
+      <a href="{% url 'core:oauth_github_start' %}?intent=login" class="social-btn btn-github">
+        <span>🔗</span> Iniciar con GitHub
+      </a>
+      <a href="{% url 'core:oauth_google_start' %}?intent=login" class="social-btn btn-google">
+        <span>G</span> Iniciar con Google
+      </a>
+      <a href="{% url 'core:oauth_microsoft_start' %}?intent=login" class="social-btn btn-microsoft">
+        <span>Ⓜ</span> Iniciar con Hotmail
+      </a>
+    </div>
+
+    {% if request.GET.logout %}
+    <div class="alert alert-success">Has cerrado sesión correctamente</div>
+    {% endif %}
+
+    {% if request.GET.registered %}
+    <div class="alert alert-success">✓ ¡Registro exitoso! Ahora puedes iniciar sesión con tu correo y contraseña.</div>
+    {% endif %}
+
+    {% for msg in messages %}
+    <div class="alert alert-danger">{{ msg }}</div>
+    {% endfor %}
+
+    <form method="post" action="{% url 'core:login' %}">
+      {% csrf_token %}
+      <div>
+        <label class="form-label">Correo electrónico</label>
+        <input type="text" name="username" class="form-control" placeholder="admin1@example.com" required autofocus>
+      </div>
+
+      <div>
+        <label class="form-label">Contraseña</label>
+          <div class="password-wrapper">
+              <input type="password" id="password" name="password" class="form-control" placeholder="••••••••••" required>
+              <button type="button" class="password-toggle" data-target="password" aria-label="Mostrar contraseña">
+                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle class="eye-pupil" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/>
+                  <line class="eye-slash" x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+          </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Ingresar</button>
+
+      <div class="checkbox-wrapper">
+        <input type="checkbox" id="remember" name="remember">
+        <label for="remember">Recordar mis datos</label>
+      </div>
+    </form>
+
+    <div class="register-link">
+      ¿No tienes cuenta? <a href="{% url 'core:register' %}">Regístrate aquí</a>
+    </div>
+  </div>
+
+  <script src="{% static 'js/login.js' %}"></script>
+</body>
+</html>

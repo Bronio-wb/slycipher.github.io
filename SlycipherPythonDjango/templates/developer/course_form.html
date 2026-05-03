@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if create %}Crear Curso{% else %}Editar Curso{% endif %} - SLYCIPHER Developer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/developer_dashboard.css' %}">
+</head>
+<body>
+  <nav class="navbar navbar-custom text-white fixed-top">
+    <div class="container-fluid px-4">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="SLYCIPHER Logo" class="logo">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge bg-primary bg-opacity-75">Panel de Desarrollador</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>{{ user.username }}</span>
+          <span class="badge bg-warning text-dark">🔥 {{ racha|default:0 }} días</span>
+          <a href="/logout/" class="btn btn-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav>
+      <a href="{% url 'core:developer_dashboard' %}"><i class="bi bi-house-door"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_course_create' %}"{% if create %} class="active"{% endif %}><i class="bi bi-plus-circle"></i> Crear Curso</a>
+      <a href="{% url 'core:developer_challenges' %}"><i class="bi bi-lightning"></i> Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+      <a href="{% url 'core:profile' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a>
+    </nav>
+  </div>
+
+  <main class="main-content courses-main-content">
+    <div class="container-fluid px-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-2"><i class="bi {% if create %}bi-plus-circle{% else %}bi-pencil-square{% endif %}"></i> {% if create %}Crear Nuevo Curso{% else %}Editar Curso{% endif %}</h2>
+          <p class="text-muted mb-0">{% if create %}Completa la información para crear tu curso{% else %}Actualiza la información del curso{% endif %}</p>
+        </div>
+        <a href="{% url 'core:developer_courses' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      <div class="form-card">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Título del Curso *</label>
+            <input type="text" name="titulo" class="form-control" required value="{{ form_data.titulo|default:'' }}" placeholder="Ej: Introducción a Python">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción *</label>
+            <textarea name="descripcion" class="form-control" rows="4" required placeholder="Describe de qué trata tu curso...">{{ form_data.descripcion|default:'' }}</textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Categoría *</label>
+              <select name="category_id" class="form-select" required>
+                <option value="">Seleccionar categoría...</option>
+                {% for cat in categories_list %}
+                <option value="{{ cat.id }}" {% if form_data.category_id|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Lenguaje de Programación *</label>
+              <select name="language_id" class="form-select" required>
+                <option value="">Seleccionar lenguaje...</option>
+                {% for lang in languages_list %}
+                <option value="{{ lang.id }}" {% if form_data.language_id|stringformat:"s" == lang.id|stringformat:"s" %}selected{% endif %}>{{ lang.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nivel *</label>
+              <select name="nivel" class="form-select" required>
+                <option value="">Seleccionar nivel...</option>
+                <option value="principiante" {% if form_data.nivel == 'principiante' %}selected{% endif %}>Principiante</option>
+                <option value="intermedio" {% if form_data.nivel == 'intermedio' %}selected{% endif %}>Intermedio</option>
+                <option value="avanzado" {% if form_data.nivel == 'avanzado' %}selected{% endif %}>Avanzado</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Duración (minutos)</label>
+              <input type="number" class="form-control" name="duracion_d" min="0" value="{{ form_data.duracion_d|default:'' }}" placeholder="60">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Requisitos Previos</label>
+            <textarea class="form-control" name="requisitos" rows="3" placeholder="Conocimientos básicos requeridos para tomar este curso...">{{ form_data.requisitos|default:'' }}</textarea>
+          </div>
+
+          {% if not create and form_data.estado == 'aprobada' %}
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" id="visible" name="visible" value="true" {% if form_data.visible == 1 or form_data.visible == '1' or form_data.visible == True or form_data.visible == 'true' or form_data.visible == 'visible' %}checked{% endif %}>
+            <label class="form-check-label" for="estado">Curso visible para estudiantes</label>
+          </div>
+          <small class="text-muted d-block mb-4">Este curso ya fue aprobado por administración y puede publicarse.</small>
+          {% else %}
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" id="visible" name="visible" value="true" disabled>
+            <label class="form-check-label" for="estado">Curso visible para estudiantes</label>
+          </div>
+          <small class="text-muted d-block mb-4">La visibilidad se habilita cuando un administrador aprueba el curso.</small>
+          {% endif %}
+
+          <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+            <a href="{% url 'core:developer_courses' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">{% if create %}Crear Curso{% else %}Guardar Cambios{% endif %}</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validación de Certificado | SLYCIPHER</title>
+  <link rel="stylesheet" href="{% static 'css/certificate_verify.css' %}">
+</head>
+<body>
+  <main class="verify-shell">
+    <section class="verify-card">
+      <div class="verify-brand">
+        <img src="{% static 'images/logo.png' %}" alt="SLYCIPHER Logo">
+        <div>
+          <p class="verify-kicker">SLYCIPHER</p>
+          <h1>Certificado Verificado</h1>
+        </div>
+      </div>
+
+      <div class="verify-status">Documento válido y registrado en la plataforma</div>
+
+      <div class="verify-grid">
+        <div class="verify-block">
+          <span class="verify-label">Estudiante</span>
+          <strong>{{ student_name }}</strong>
+        </div>
+        <div class="verify-block">
+          <span class="verify-label">Tipo</span>
+          <strong>{{ certificate_type_label }}</strong>
+        </div>
+        <div class="verify-block">
+          <span class="verify-label">Curso / alcance</span>
+          <strong>{{ course_title }}</strong>
+        </div>
+        <div class="verify-block">
+          <span class="verify-label">Código</span>
+          <strong>{{ certificate.code }}</strong>
+        </div>
+        <div class="verify-block">
+          <span class="verify-label">Emitido por</span>
+          <strong>{{ issued_by_name }}</strong>
+        </div>
+        <div class="verify-block">
+          <span class="verify-label">Fecha de emisión</span>
+          <strong>{{ ceremonial_date }}</strong>
+        </div>
+      </div>
+
+      <div class="verify-note">
+        Este certificado fue emitido desde el panel administrativo de SLYCIPHER y su código único coincide con el registro almacenado en la plataforma.
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Desarrollador - SLYCIPHER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/developer_dashboard.css' %}">
+</head>
+<body>
+  <nav class="navbar-custom text-white p-3 fixed-top">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/logo.png' %}" alt="SLYCIPHER Logo" class="logo">
+          <h4 class="mb-0 fw-bold">SLYCIPHER Developer</h4>
+          <span class="badge panel-badge">Panel de Desarrollador</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span>Bienvenido, {{ user.username }}</span>
+          <span class="badge bg-warning text-dark">
+            <i class="bi bi-fire"></i> Racha: {{ racha }} días
+          </span>
+          <a href="/logout/" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar">
+    <nav class="mt-3">
+      <a href="{% url 'core:developer_dashboard' %}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'core:developer_courses' %}"><i class="bi bi-book"></i> Mis Cursos</a>
+      <a href="{% url 'core:developer_course_create' %}"><i class="bi bi-plus-circle"></i> Crear Curso</a>
+      <a href="{% url 'core:developer_my_courses_students' %}"><i class="bi bi-people"></i> Estudiantes</a>
+      <a href="{% url 'core:developer_challenges' %}"><i class="bi bi-trophy"></i> Desafíos</a>
+      <a href="{% url 'core:developer_pending_solutions' %}">
+        <i class="bi bi-clock-history"></i> Revisar Soluciones
+        {% if pendientes > 0 %}
+          <span class="badge bg-warning text-dark ms-2">{{ pendientes }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'core:developer_statistics' %}"><i class="bi bi-graph-up"></i> Estadísticas</a>
+      <a href="{% url 'core:profile' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="container-fluid p-4">
+      <h2 class="mb-4">Dashboard de Desarrollador</h2>
+
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1">Mis Cursos</p>
+                <h2 class="mb-0 stat-navy">{{ mis_cursos }}</h2>
+              </div>
+              <div class="stat-icon text-white bg-navy">
+                <i class="bi bi-book"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1">Mis Lecciones</p>
+                <h2 class="mb-0 stat-blue">{{ total_lecciones }}</h2>
+              </div>
+              <div class="stat-icon text-white bg-blue">
+                <i class="bi bi-journal-text"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1">Mis Desafíos</p>
+                <h2 class="mb-0 stat-orange">{{ total_desafios }}</h2>
+              </div>
+              <div class="stat-icon text-white bg-orange">
+                <i class="bi bi-trophy"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1">Pendientes</p>
+                <h2 class="mb-0 stat-orange">{{ pendientes }}</h2>
+              </div>
+              <div class="stat-icon text-white bg-orange">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="mb-0 fw-bold">Mis Cursos Recientes</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for curso in cursos_recientes %}
+            <div class="col-md-4 mb-3">
+              <div class="course-card">
+                <a href="{% url 'core:developer_course_view' curso.id %}" class="d-block text-center mb-3" style="text-decoration: none;">
+                  <img src="{% static 'images/logo_desafios.png' %}" alt="Logo del Curso" class="course-logo">
+                </a>
+                <h6 class="fw-bold mb-2"><a href="{% url 'core:developer_course_view' curso.id %}" class="text-dark text-decoration-none">{{ curso.titulo }}</a></h6>
+                <p class="text-muted small mb-3">{{ curso.descripcion|default:'Sin descripción' }}</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-secondary">{{ curso.lenguaje|default:'N/A' }}</span>
+                  <span class="badge bg-info">{{ curso.nivel|default:'N/A' }}</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-light text-dark"><i class="bi bi-journal-text"></i> {{ curso.lenguaje|default:'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+              <p class="text-muted">No tienes cursos recientes</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <h5 class="mb-3 fw-bold">Acciones Rápidas</h5>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <a href="{% url 'core:developer_course_create' %}" class="action-btn-large btn-blue">
+            <i class="bi bi-plus-circle fs-1 d-block mb-2"></i>
+            Crear Nuevo Curso
+          </a>
+        </div>
+        <div class="col-md-4 mb-3">
+          <a href="{% url 'core:developer_challenges' %}" class="action-btn-large btn-purple">
+            <i class="bi bi-trophy fs-1 d-block mb-2"></i>
+            Gestionar Desafíos
+          </a>
+        </div>
+        <div class="col-md-4 mb-3">
+          <a href="{% url 'core:developer_courses' %}" class="action-btn-large btn-green">
+            <i class="bi bi-book fs-1 d-block mb-2"></i>
+            Ver Mis Cursos
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
